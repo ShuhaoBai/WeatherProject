@@ -1,38 +1,83 @@
 import React from 'react';
-import { fetchData } from './api';
-import Map from './components/Map';
+import { fetchStations, fetchStationsWithinRange } from './api';
+import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import WeatherStationCard from './components/WeatherStationCard';
-import DatePickerComponent from './components/DatePickerComponent';
+import Button from '@material-ui/core/Button';
+import WeatherStationTable from './components/WeatherStationTable';
+import { IStationsResults } from './models/Stations';
 
-class App extends React.Component {
-  // state = {
-  //   data: {},
-  // };
+export interface IAppProps {}
+export interface IAppState {
+  // metadata: IStationsMetadata;
+  results: IStationsResults[];
+  lat_lo: string;
+  lng_lo: string;
+  lat_hi: string;
+  lng_hi: string;
+}
 
-  async componentDidMount() {
-    const fetchedData = await fetchData();
-    console.log(fetchedData);
+class App extends React.Component<IAppProps, IAppState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      results: [],
+      lat_lo: '',
+      lng_lo: '',
+      lat_hi: '',
+      lng_hi: '',
+    };
   }
 
+  async componentDidMount() {
+    const fetchedStationsData = await fetchStations();
+    if (fetchedStationsData) {
+      this.setState({
+        results: fetchedStationsData.results,
+      });
+      console.log(fetchedStationsData.results);
+    }
+  }
+
+  handleClick = async () => {
+    const fetchedStationsDataWithinRange = await fetchStationsWithinRange();
+    if (fetchedStationsDataWithinRange) {
+      this.setState({
+        results: fetchedStationsDataWithinRange.results,
+      });
+      console.log(fetchedStationsDataWithinRange.results);
+    }
+  };
+
+  getRangedStationsData = async () => {
+    const fetchedStationsDataWithinRange = await fetchStationsWithinRange();
+    if (fetchedStationsDataWithinRange) {
+      this.setState({
+        results: fetchedStationsDataWithinRange.results,
+      });
+      console.log(fetchedStationsDataWithinRange.results);
+    }
+  };
+
   render() {
-    // const { data } = this.state;
     return (
       <div>
         <Grid container spacing={3}>
           <Grid item xs={4}>
             <Paper>
-              <WeatherStationCard />
+              <WeatherStationTable results={this.state.results} />
             </Paper>
-            <Paper>
-              <DatePickerComponent />
-            </Paper>
+            <Button variant="contained" onClick={this.handleClick}>
+              Search
+            </Button>
           </Grid>
 
           <Grid item xs={8}>
             <Paper>
-              <Map />
+              <MapComponent
+                results={this.state.results}
+                getRangedStationsData={this.getRangedStationsData}
+              />
             </Paper>
           </Grid>
         </Grid>
