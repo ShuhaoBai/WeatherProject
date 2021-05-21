@@ -1,5 +1,5 @@
-import { LeafletEvent, Map } from 'leaflet';
 import React from 'react';
+import * as L from 'leaflet';
 import {
   MapContainer,
   TileLayer,
@@ -8,31 +8,61 @@ import {
   useMapEvents,
 } from 'react-leaflet';
 import { IStationsResults } from '../models/Stations';
+
+interface IGrabBoundsProps {
+  saveBounds: (num: number[]) => void;
+}
+function GrabBounds({ saveBounds }: IGrabBoundsProps) {
+  useMapEvents({
+    moveend: (e) => {
+      const bd = e.target.getBounds();
+      console.log('raw new bounds data');
+      console.log(bd);
+      const { _southWest, _northEast } = bd;
+      console.log(_southWest.lat, _southWest.lng);
+      console.log(_northEast.lat, _northEast.lng);
+      let corner1 = [];
+      let corner2 = [];
+      corner1 = _southWest;
+
+      corner2 = _northEast;
+      console.log('[corner1,corner2]' + [corner1, corner2]);
+      let newBoundsReturn = [corner1, corner2];
+      console.log('newBoundsReturn: ' + newBoundsReturn);
+      saveBounds(newBoundsReturn);
+    },
+  });
+  return null;
+}
+
 export interface IMapComponentProps {
   results: IStationsResults[];
   getRangedStationsData: () => void;
 }
-class MapComponent extends React.Component<IMapComponentProps> {
-  mapRef: React.RefObject<unknown>;
+export interface IMapComponentState {
+  boundsData: L.LatLngBounds[];
+}
+class MapComponent extends React.Component<
+  IMapComponentProps,
+  IMapComponentState
+> {
   constructor(props: IMapComponentProps | Readonly<IMapComponentProps>) {
     super(props);
-    this.mapRef = React.createRef();
+    this.state = {
+      boundsData: [],
+    };
   }
   handleMoveEnd = () => {
     console.log('map moved!');
   };
-  // grabBounds() {
-  //   let lat_lo;
-  //   let lng_lo;
-  //   let lat_hi;
-  //   let lng_hi;
-  //   let currBounds = Map.getBounds();
-  //   lat_lo = currBounds.getSouthWest().lat;
-  //   lng_lo = currBounds.getSouthWest().lng;
-  //   lat_hi = currBounds.getNorthEast().lat;
-  //   lng_hi = currBounds.getNorthEast().lng;
-  //   console.log(lat_lo, lng_lo, lat_hi, lng_hi);
-  // }
+  saveBoundsMethod = (newBoundCoords: any) => {
+    console.log(newBoundCoords); //[LatLng, LatLng]
+    console.log(newBoundCoords[0]); //[LatLng, LatLng]
+    console.log(newBoundCoords[1]); //[LatLng, LatLng]
+    const boundsData = [...this.state.boundsData, newBoundCoords];
+    this.setState((prevState) => ({ ...prevState, boundsData }));
+    console.log('print out state boundsData: ' + this.state.boundsData);
+  };
 
   render() {
     const { results, getRangedStationsData } = this.props;
@@ -43,26 +73,6 @@ class MapComponent extends React.Component<IMapComponentProps> {
         zoom={4}
         scrollWheelZoom={false}
         style={{ height: 1000 }}
-        whenCreated={(map) => {
-          map.on('moveend', () => {
-            let lat_lo;
-            let lng_lo;
-            let lat_hi;
-            let lng_hi;
-            let currBounds = map.getBounds();
-            lat_lo = currBounds.getSouthWest().lat;
-            lng_lo = currBounds.getSouthWest().lng;
-            lat_hi = currBounds.getNorthEast().lat;
-            lng_hi = currBounds.getNorthEast().lng;
-            console.log(lat_lo, lng_lo, lat_hi, lng_hi);
-          });
-          map.on('click', () => {
-            console.log('clicked as well');
-          });
-        }}
-        // whenCreated={(mapInstance) => {
-        //   this.mapRef.current = mapInstance;
-        // }}
       >
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -86,6 +96,7 @@ class MapComponent extends React.Component<IMapComponentProps> {
             </Popup>
           </Marker>
         ))}
+        <GrabBounds saveBounds={this.saveBoundsMethod} />
       </MapContainer>
     );
   }

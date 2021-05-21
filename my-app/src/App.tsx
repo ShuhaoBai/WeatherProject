@@ -9,7 +9,6 @@ import { IStationsResults } from './models/Stations';
 
 export interface IAppProps {}
 export interface IAppState {
-  // metadata: IStationsMetadata;
   results: IStationsResults[];
   lat_lo: string;
   lng_lo: string;
