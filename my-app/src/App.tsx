@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import WeatherStationTable from './components/WeatherStationTable';
 import { IStationsResults } from './models/Stations';
-
+import * as L from 'leaflet';
 export interface IAppProps {}
 export interface IAppState {
   results: IStationsResults[];
@@ -14,6 +14,7 @@ export interface IAppState {
   lng_lo: string;
   lat_hi: string;
   lng_hi: string;
+  boundsData: L.LatLngBounds[];
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -25,6 +26,7 @@ class App extends React.Component<IAppProps, IAppState> {
       lng_lo: '',
       lat_hi: '',
       lng_hi: '',
+      boundsData: [],
     };
   }
 
@@ -34,8 +36,12 @@ class App extends React.Component<IAppProps, IAppState> {
       this.setState({
         results: fetchedStationsData.results,
       });
-      console.log(fetchedStationsData.results);
     }
+  }
+  componentDidUpdate() {
+    console.log(
+      '{Parent} Parent componentDidUpdate state ====> ' + this.state.boundsData
+    );
   }
 
   handleClick = async () => {
@@ -44,7 +50,6 @@ class App extends React.Component<IAppProps, IAppState> {
       this.setState({
         results: fetchedStationsDataWithinRange.results,
       });
-      console.log(fetchedStationsDataWithinRange.results);
     }
   };
 
@@ -54,8 +59,14 @@ class App extends React.Component<IAppProps, IAppState> {
       this.setState({
         results: fetchedStationsDataWithinRange.results,
       });
-      console.log(fetchedStationsDataWithinRange.results);
     }
+  };
+
+  getNewBoundsDataFromParent = (value: L.LatLngBounds[]) => {
+    this.setState({
+      boundsData: value,
+    });
+    console.log('{Parent} value from child ====> ' + value);
   };
 
   render() {
@@ -76,6 +87,7 @@ class App extends React.Component<IAppProps, IAppState> {
               <MapComponent
                 results={this.state.results}
                 getRangedStationsData={this.getRangedStationsData}
+                gerNewBoundsDataFromParent={this.getNewBoundsDataFromParent}
               />
             </Paper>
           </Grid>
