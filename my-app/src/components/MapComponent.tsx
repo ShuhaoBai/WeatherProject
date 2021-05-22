@@ -27,7 +27,6 @@ function GrabBounds({ saveBounds }: IGrabBoundsProps) {
 
 export interface IMapComponentProps {
   results: IStationsResults[];
-  getRangedStationsData: () => void;
   getNewBoundsDataFromParent: (val: L.LatLngBounds[]) => void;
 }
 export interface IMapComponentState {
