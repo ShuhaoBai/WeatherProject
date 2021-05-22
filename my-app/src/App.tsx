@@ -38,11 +38,24 @@ class App extends React.Component<IAppProps, IAppState> {
       });
     }
   }
-  componentDidUpdate() {
-    console.log(
-      '{Parent} Parent componentDidUpdate state ====> ' + this.state.boundsData
-    );
+  componentDidUpdate(
+    prevProps: any,
+    prevState: { boundsData: L.LatLngBounds[] }
+  ) {
+    if (prevState.boundsData !== this.state.boundsData) {
+      this.handleZoomSearch();
+    }
   }
+  handleZoomSearch = () => {
+    let southWest_lat = this.state.boundsData[0].getSouthWest().lat;
+    let southWest_lng = this.state.boundsData[0].getSouthWest().lng;
+    let northEast_lat = this.state.boundsData[0].getNorthEast().lat;
+    let northEast_lng = this.state.boundsData[0].getNorthEast().lng;
+    console.log('southWest_lat: ' + southWest_lat);
+    console.log('southWest_lng: ' + southWest_lng);
+    console.log('northEast_lat: ' + northEast_lat);
+    console.log('northEast_lng: ' + northEast_lng);
+  };
 
   handleClick = async () => {
     const fetchedStationsDataWithinRange = await fetchStationsWithinRange();
@@ -66,7 +79,6 @@ class App extends React.Component<IAppProps, IAppState> {
     this.setState({
       boundsData: value,
     });
-    console.log('{Parent} value from child ====> ' + value);
   };
 
   render() {
@@ -87,7 +99,7 @@ class App extends React.Component<IAppProps, IAppState> {
               <MapComponent
                 results={this.state.results}
                 getRangedStationsData={this.getRangedStationsData}
-                gerNewBoundsDataFromParent={this.getNewBoundsDataFromParent}
+                getNewBoundsDataFromParent={this.getNewBoundsDataFromParent}
               />
             </Paper>
           </Grid>

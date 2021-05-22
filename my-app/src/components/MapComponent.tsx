@@ -10,19 +10,15 @@ import {
 import { IStationsResults } from '../models/Stations';
 
 interface IGrabBoundsProps {
-  saveBounds: (num: number[]) => void;
+  saveBounds: (num: L.LatLngBounds[]) => void;
 }
 function GrabBounds({ saveBounds }: IGrabBoundsProps) {
   useMapEvents({
     moveend: (e) => {
       const bd = e.target.getBounds();
-      const { _southWest, _northEast } = bd;
-      let corner1 = [];
-      let corner2 = [];
-      corner1 = _southWest;
-
-      corner2 = _northEast;
-      let newBoundsReturn = [corner1, corner2];
+      let corner1 = bd._southWest;
+      let corner2 = bd._northEast;
+      let newBoundsReturn = [new L.LatLngBounds(corner1, corner2)];
       saveBounds(newBoundsReturn);
     },
   });
@@ -32,7 +28,7 @@ function GrabBounds({ saveBounds }: IGrabBoundsProps) {
 export interface IMapComponentProps {
   results: IStationsResults[];
   getRangedStationsData: () => void;
-  gerNewBoundsDataFromParent: (val: L.LatLngBounds[]) => void;
+  getNewBoundsDataFromParent: (val: L.LatLngBounds[]) => void;
 }
 export interface IMapComponentState {
   boundsData: L.LatLngBounds[];
@@ -47,9 +43,10 @@ class MapComponent extends React.Component<
       boundsData: [],
     };
   }
-  saveBoundsMethod = (newBoundCoords: any) => {
-    const boundsData = [...this.state.boundsData, newBoundCoords];
-    this.setState((prevState) => ({ ...prevState, boundsData }));
+  saveBoundsMethod = (newBoundCoords: L.LatLngBounds[]) => {
+    this.setState({
+      boundsData: newBoundCoords,
+    });
   };
   componentDidUpdate(
     prevProps: any,
@@ -64,16 +61,13 @@ class MapComponent extends React.Component<
   }
 
   handleParentMethod = () => {
-    console.log(
-      '[Child] this.handleParentMethod being called and this.state.boundsData is ' +
-        this.state.boundsData
-    );
-    this.props.gerNewBoundsDataFromParent(this.state.boundsData);
+    if (this.state.boundsData) {
+      this.props.getNewBoundsDataFromParent(this.state.boundsData);
+    }
   };
 
   render() {
-    const { results, getRangedStationsData } = this.props;
-    const { boundsData } = this.state;
+    const { results } = this.props;
     return (
       <MapContainer
         center={[38.9471, -98.3534]}
