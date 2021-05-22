@@ -4,6 +4,7 @@ import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
+import DatePicker from './components/date-picker-airbnb/DatePicker';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
 export interface IAppProps {}
@@ -83,7 +84,11 @@ class App extends React.Component<IAppProps, IAppState> {
             <Paper>
               <WeatherStationTable results={this.state.results} />
             </Paper>
+            <Paper>
+              <DatePicker />
+            </Paper>
           </Grid>
+
           <Grid item xs={8}>
             <Paper>
               <MapComponent
