@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import moment, { Moment } from 'moment';
 const api_token = 'ipZdCjijQVoUPrAsXXOpPEumFeCNNVio';
 
 export const fetchStations = async () => {
@@ -30,18 +30,24 @@ export const fetchSingleStation = async (stationId: string) => {
   }
 };
 
-export const fetchSingleStationYealySummary = async (
-  selectedStationId: string
+export const fetchSingleStationYealySummaryWithStationId = async (
+  selectedStationId: string,
+  startDate: Moment,
+  endDate: Moment
 ) => {
-  const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=PRECIP_15&stationid=${selectedStationId}&units=metric&startdate=2012-05-01&enddate=2012-05-31`;
+  const convertedStartDate = startDate.format().slice(0, 10);
+  const convertedEndDate = endDate.format().slice(0, 10);
+  const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=PRECIP_15&stationid=${selectedStationId}&units=metric&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
   try {
-    const fetchedSingleStationYearlySummary = await axios.get(`${setUrl}`, {
-      headers: { token: `${api_token}` },
-    });
+    const fetchedSingleStationYearlySummaryWithStationId = await axios.get(
+      `${setUrl}`,
+      {
+        headers: { token: `${api_token}` },
+      }
+    );
     const {
       data: { results },
-    } = fetchedSingleStationYearlySummary;
-    // console.log(fetchedSingleStationYearlySummary);
+    } = fetchedSingleStationYearlySummaryWithStationId;
     return { results };
   } catch (error) {
     console.log(error);
@@ -55,25 +61,6 @@ export const fetchStationsWithinRange = async (
   lng_hi: number
 ) => {
   const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?extent=${lat_lo},${lng_lo},${lat_hi},${lng_hi}`;
-  try {
-    const fetchedStationsData = await axios.get(`${url}`, {
-      headers: { token: `${api_token}` },
-    });
-    const {
-      data: { results },
-    } = fetchedStationsData;
-    return { results };
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchStationsWithinFixedDateRange = async () => {
-  //Test - fixed date code
-  const startdate = '2010-01-01';
-  const enddate = '2012-01-01';
-  // const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?startdate=${startdate}&enddate=${enddate}`;
-  const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?startdate=${startdate}`;
   try {
     const fetchedStationsData = await axios.get(`${url}`, {
       headers: { token: `${api_token}` },

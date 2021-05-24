@@ -2,9 +2,7 @@ import React from 'react';
 import {
   fetchStations,
   fetchStationsWithinRange,
-  fetchStationsWithinFixedDateRange,
   fetchSingleStation,
-  fetchSingleStationYealySummary,
 } from './api';
 import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
@@ -18,6 +16,7 @@ import TestingDisplay from './components/date-picker-airbnb/TestingDisplay';
 import moment, { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
+import { Button } from '@material-ui/core';
 
 export interface IAppProps {}
 export interface IAppState {
@@ -34,10 +33,13 @@ export interface IAppState {
   mindate: string;
   name: string;
   //----selected Date Range from <DatePicker />
-  startDate: Moment | null;
-  endDate: Moment | null;
+  startDate?: Moment;
+  endDate?: Moment;
   //----combined date range
   newDateRange: DateRange | null;
+  //----year search buffer parameters
+  bufferStartDate?: Moment;
+  bufferEndDate?: Moment;
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -56,13 +58,17 @@ class App extends React.Component<IAppProps, IAppState> {
       mindate: '',
       name: '',
       //selected date range
-      startDate: null,
-      endDate: null,
+      startDate: undefined,
+      endDate: undefined,
       //combined date range
       newDateRange: null,
+      //yearly search parameter buffer
+      bufferStartDate: undefined,
+      bufferEndDate: undefined,
     };
   }
 
+  //Fetch fixed 25 stations when App first time loaded.
   async componentDidMount() {
     const fetchedStationsData = await fetchStations();
     if (fetchedStationsData) {
@@ -70,10 +76,9 @@ class App extends React.Component<IAppProps, IAppState> {
         results: fetchedStationsData.results,
       });
     }
-    const fetchedStationsDataWithinDateRange =
-      await fetchStationsWithinFixedDateRange();
-    console.log(fetchedStationsDataWithinDateRange);
   }
+
+  //Auto-searching when users pan/zoom map
   componentDidUpdate(
     prevProps: any,
     prevState: { boundsData: L.LatLngBounds[] }
@@ -113,7 +118,7 @@ class App extends React.Component<IAppProps, IAppState> {
       });
     }
   };
-
+  //Get new bounds corner data when users pan/zoom the map, from <MapComponent />
   getNewBoundsDataFromParent = (value: L.LatLngBounds[]) => {
     this.setState({
       boundsData: value,
@@ -122,17 +127,14 @@ class App extends React.Component<IAppProps, IAppState> {
 
   //Get one single station id from WeatherStationTable, by clicking on a table row
   getSelectedStationId = (selectedStationId: string) => {
+    // console selected station's id
     console.log(selectedStationId);
-    // this.setState({
-    //   selectedStationId: selectedStationId,
-    // });
     this.startFetchingSingleStationData(selectedStationId);
-
-    //===After user click on table row, fetch clicked station's yearly summary data
-    this.startFetchingSingleStationYearlySummaryData(selectedStationId);
   };
 
-  //Get one specific weather station data with selectedStationId
+  //Tessting -- Get one specific weather station data with selectedStationId from the table
+  //and pass fetched data to <SingleWeatherStationTable />
+  //TODO - will remove this method, and render single table with selected date range
   startFetchingSingleStationData = async (selectedStationId: string) => {
     const fetchedSingleStationData = await fetchSingleStation(
       selectedStationId
@@ -152,17 +154,8 @@ class App extends React.Component<IAppProps, IAppState> {
     }
   };
 
-  //Get one specific weather station's yearly data based on selected stationId
-  //TODO - implement the function of manully select date range from DatePicker
+  //TODO - implement the function of manully select date range from DatePicker - done
   //TODO - ability to select datasetid and units, then fetch yearly data
-  startFetchingSingleStationYearlySummaryData = async (
-    selectedStationId: string
-  ) => {
-    //Test
-    const fetchSingleStationYealySummaryData =
-      await fetchSingleStationYealySummary(selectedStationId);
-    console.log(fetchSingleStationYealySummaryData);
-  };
 
   getSelectednewStartDate = (newStartDate: Moment) => {
     this.setState(
@@ -178,6 +171,20 @@ class App extends React.Component<IAppProps, IAppState> {
         endDate: newEndDate,
       },
       () => console.log(this.state.endDate)
+    );
+  };
+  onClickSubmit = () => {
+    this.setState(
+      {
+        bufferStartDate: this.state.startDate,
+        bufferEndDate: this.state.endDate,
+      },
+      () =>
+        console.log(
+          //TODO - need to find better way to format moment
+          this.state.bufferStartDate?.format().slice(0, 10),
+          this.state.bufferEndDate?.format().slice(0, 10)
+        )
     );
   };
 
@@ -203,6 +210,8 @@ class App extends React.Component<IAppProps, IAppState> {
                 maxdate={this.state.maxdate}
                 mindate={this.state.mindate}
                 name={this.state.name}
+                bufferStartDate={this.state.bufferStartDate}
+                bufferEndDate={this.state.bufferEndDate}
               />
             </Paper>
             <Paper>
@@ -210,6 +219,7 @@ class App extends React.Component<IAppProps, IAppState> {
                 getSelectednewStartDate={this.getSelectednewStartDate}
                 getSelectednewEndDate={this.getSelectednewEndDate}
               />
+              <Button onClick={this.onClickSubmit}>Search</Button>
             </Paper>
           </Grid>
           <Paper>

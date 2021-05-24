@@ -1,8 +1,8 @@
 import React from 'react';
 import moment, { Moment } from 'moment';
 export interface ITestingDisplayProps {
-  startDate: Moment | null;
-  endDate: Moment | null;
+  startDate?: Moment;
+  endDate?: Moment;
 }
 class TestingDisplay extends React.Component<ITestingDisplayProps> {
   render() {
