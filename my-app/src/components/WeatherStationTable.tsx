@@ -22,6 +22,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { IStationsResults } from '../models/Stations';
 
+//---table related methods
 const useStyles1 = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -132,7 +133,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
     },
   })
 )(TableCell);
-
+//---table related methods
 export interface IWeatherStationTableProps {
   results: IStationsResults[];
   getSelectedStationId: (selectedStationId: string) => void;
@@ -154,6 +155,7 @@ class WeatherStationTable extends React.Component<
       rowsPerPage: 5,
     };
   }
+  //---table related methods
   handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -172,9 +174,12 @@ class WeatherStationTable extends React.Component<
     });
     // setPage(0);
   };
+  //---table related methods
   handleRowClick = (cellValue: string) => {
     const stationId = cellValue;
-    console.log(stationId);
+    console.log(
+      '1. User click on a table row to select a station: ' + stationId
+    );
     this.props.getSelectedStationId(stationId);
   };
 

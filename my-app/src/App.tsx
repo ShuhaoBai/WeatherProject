@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
 import SingleWeatherStationTable from './components/SingleWeatherStationTable';
+import NewSingleTable from './components/NewSingleTable';
 import DatePicker, {
   DateRange,
 } from './components/date-picker-airbnb/DatePicker';
@@ -17,6 +18,7 @@ import moment, { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
 import { Button } from '@material-ui/core';
+import { IPrecipStationResults } from './models/PrecipStation';
 
 export interface IAppProps {}
 export interface IAppState {
@@ -24,14 +26,14 @@ export interface IAppState {
   boundsData: L.LatLngBounds[];
   selectedStationId: string;
   //----single station data
-  elevation: number;
-  elevationUnit: string;
-  id: string;
-  latitude: string;
-  longitude: string;
-  maxdate: string;
-  mindate: string;
-  name: string;
+  // elevation: number;
+  // elevationUnit: string;
+  // id: string;
+  // latitude: string;
+  // longitude: string;
+  // maxdate: string;
+  // mindate: string;
+  // name: string;
   //----selected Date Range from <DatePicker />
   startDate?: Moment;
   endDate?: Moment;
@@ -40,6 +42,8 @@ export interface IAppState {
   //----year search buffer parameters
   bufferStartDate?: Moment;
   bufferEndDate?: Moment;
+  //------results that passed into NewSingleTable
+  singleTableResults: IPrecipStationResults[];
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -49,14 +53,14 @@ class App extends React.Component<IAppProps, IAppState> {
       results: [],
       boundsData: [],
       selectedStationId: '',
-      elevation: 0,
-      elevationUnit: '',
-      id: '',
-      latitude: '',
-      longitude: '',
-      maxdate: '',
-      mindate: '',
-      name: '',
+      // elevation: 0,
+      // elevationUnit: '',
+      // id: '',
+      // latitude: '',
+      // longitude: '',
+      // maxdate: '',
+      // mindate: '',
+      // name: '',
       //selected date range
       startDate: undefined,
       endDate: undefined,
@@ -65,6 +69,8 @@ class App extends React.Component<IAppProps, IAppState> {
       //yearly search parameter buffer
       bufferStartDate: undefined,
       bufferEndDate: undefined,
+      //------results that passed into NewSingleTable
+      singleTableResults: [],
     };
   }
 
@@ -130,31 +136,44 @@ class App extends React.Component<IAppProps, IAppState> {
   //Get one single station id from WeatherStationTable, by clicking on a table row
   getSelectedStationId = (selectedStationId: string) => {
     // console selected station's id
-    console.log(selectedStationId);
-    this.startFetchingSingleStationData(selectedStationId);
+    console.log(
+      '2. Receive the user selected station at App.tsx: ' + selectedStationId
+    );
+    this.setState(
+      {
+        selectedStationId: selectedStationId,
+      },
+      () =>
+        console.log(
+          '3. Set selected staion id to App.tsx state: ' +
+            this.state.selectedStationId
+        )
+    );
+    // this.startFetchingSingleStationData(selectedStationId);
   };
 
   //Tessting -- Get one specific weather station data with selectedStationId from the table
   //and pass fetched data to <SingleWeatherStationTable />
-  //TODO - will remove this method, and render single table with selected date range
-  startFetchingSingleStationData = async (selectedStationId: string) => {
-    const fetchedSingleStationData = await fetchSingleStation(
-      selectedStationId
-    );
-    console.log(fetchedSingleStationData);
-    if (fetchedSingleStationData) {
-      this.setState({
-        elevation: fetchedSingleStationData.data.elevation,
-        elevationUnit: fetchedSingleStationData.data.elevationUnit,
-        id: fetchedSingleStationData.data.id,
-        latitude: fetchedSingleStationData.data.latitude,
-        longitude: fetchedSingleStationData.data.longitude,
-        maxdate: fetchedSingleStationData.data.maxdate,
-        mindate: fetchedSingleStationData.data.mindate,
-        name: fetchedSingleStationData.data.name,
-      });
-    }
-  };
+  //TODO - will remove this method, and render single table with selected date rangea，
+  //这个方法是老方法，之前用来测试用户选中table里一个station之后，fetch一下这个station的信息。
+  //然后把fetch到的信息先存在App的state里，然后用props传给<SingleWeatherStationTable>来展示
+  // startFetchingSingleStationData = async (selectedStationId: string) => {
+  //   const fetchedSingleStationData = await fetchSingleStation(
+  //     selectedStationId
+  //   );
+  //   if (fetchedSingleStationData) {
+  //     this.setState({
+  //       elevation: fetchedSingleStationData.data.elevation,
+  //       elevationUnit: fetchedSingleStationData.data.elevationUnit,
+  //       id: fetchedSingleStationData.data.id,
+  //       latitude: fetchedSingleStationData.data.latitude,
+  //       longitude: fetchedSingleStationData.data.longitude,
+  //       maxdate: fetchedSingleStationData.data.maxdate,
+  //       mindate: fetchedSingleStationData.data.mindate,
+  //       name: fetchedSingleStationData.data.name,
+  //     });
+  //   }
+  // };
 
   //TODO - implement the function of manully select date range from DatePicker - done
   //TODO - ability to select datasetid and units, then fetch yearly data
@@ -202,18 +221,14 @@ class App extends React.Component<IAppProps, IAppState> {
               />
             </Paper>
             <Paper>
-              <SingleWeatherStationTable
+              {/* <SingleWeatherStationTable
+                singleTableResults={this.state.singleTableResults}
                 stationId={this.state.selectedStationId}
-                elevation={this.state.elevation}
-                elevationUnit={this.state.elevationUnit}
-                id={this.state.id}
-                latitude={this.state.latitude}
-                longitude={this.state.longitude}
-                maxdate={this.state.maxdate}
-                mindate={this.state.mindate}
-                name={this.state.name}
                 bufferStartDate={this.state.bufferStartDate}
                 bufferEndDate={this.state.bufferEndDate}
+              /> */}
+              <NewSingleTable
+                singleTableResults={this.state.singleTableResults}
               />
             </Paper>
             <Paper>

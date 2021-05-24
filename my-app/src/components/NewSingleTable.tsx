@@ -1,10 +1,4 @@
 import React from 'react';
-import moment, { Moment } from 'moment';
-import {
-  fetchSingleStation,
-  fetchStationsWithinRange,
-  fetchSingleStationYealySummaryWithStationId,
-} from '../api';
 import {
   makeStyles,
   useTheme,
@@ -12,25 +6,22 @@ import {
   createStyles,
   withStyles,
 } from '@material-ui/core/styles';
-import { IPrecipStationResults } from '../models/PrecipStation';
-import {
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableContainer,
-  TableFooter,
-  TableHead,
-  TablePagination,
-} from '@material-ui/core';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
+import { IPrecipStationResults } from '../models/PrecipStation';
 
-//------Table related-------
 const useStyles1 = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -118,6 +109,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
     </div>
   );
 }
+
 const StyledTableRow = withStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -139,33 +131,31 @@ const StyledTableCell = withStyles((theme: Theme) =>
     },
   })
 )(TableCell);
-//------Table related-------
-
-export interface ISingleWeatherStationTableProps {
-  stationId: string;
-  bufferStartDate?: Moment;
-  bufferEndDate?: Moment;
+//===================
+//===================
+//===================
+//===================
+//===================
+//===================
+export interface INewSingleTableProps {
+  singleTableResults: IPrecipStationResults[];
 }
-export interface ISingleWeatherStationTableState {
-  results: IPrecipStationResults[];
+export interface INewSingleTableState {
   page: number;
   rowsPerPage: number;
 }
 
-class SingleWeatherStationTable extends React.Component<
-  ISingleWeatherStationTableProps,
-  ISingleWeatherStationTableState
+class NewSingleTable extends React.Component<
+  INewSingleTableProps,
+  INewSingleTableState
 > {
-  constructor(props: any) {
+  constructor(props: INewSingleTableProps) {
     super(props);
     this.state = {
-      results: [],
       page: 0,
       rowsPerPage: 5,
     };
   }
-
-  //---table related methods---
   handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -184,79 +174,13 @@ class SingleWeatherStationTable extends React.Component<
     });
     // setPage(0);
   };
-
-  //---table related methods---
-
-  startFetchingSingleStationYearlySummaryWithStationId = async (
-    stationId: string,
-    bufferStartDate: Moment,
-    bufferEndDate: Moment
-  ) => {
-    if (this.props.bufferStartDate && this.props.bufferEndDate) {
-      const fetchedSingleStationYealySummaryDataWithStationId =
-        await fetchSingleStationYealySummaryWithStationId(
-          this.props.stationId,
-          this.props.bufferStartDate,
-          this.props.bufferEndDate
-        );
-      if (fetchedSingleStationYealySummaryDataWithStationId) {
-        this.setState({
-          results: fetchedSingleStationYealySummaryDataWithStationId.results,
-        });
-      }
-      console.log(fetchedSingleStationYealySummaryDataWithStationId);
-    }
-  };
-
-  async componentDidUpdate(
-    prevProps: {
-      stationId: string;
-      bufferStartDate?: Moment;
-      bufferEndDate?: Moment;
-    },
-    prevState: any
-  ) {
-    if (
-      (prevProps.bufferStartDate !== this.props.bufferStartDate &&
-        prevProps.bufferEndDate !== this.props.bufferEndDate) ||
-      prevProps.stationId !== this.props.stationId
-    ) {
-      if (this.props.bufferStartDate && this.props.bufferEndDate) {
-        console.log(
-          '4. Singe Table should receive the selected station id: ' +
-            this.props.stationId
-        );
-        await this.startFetchingSingleStationYearlySummaryWithStationId(
-          this.props.stationId,
-          this.props.bufferStartDate,
-          this.props.bufferEndDate
-        );
-      }
-      // console.log('inside componentDidUpdate()');
-    }
-  }
-
   render() {
-    const { results } = this.state;
+    const { singleTableResults } = this.props;
     const { page, rowsPerPage } = this.state;
     const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, results.length - page * rowsPerPage);
+      rowsPerPage -
+      Math.min(rowsPerPage, singleTableResults.length - page * rowsPerPage);
     return (
-      //-----old testing divs-------
-      // <div>
-      //   <h1>{this.props.stationId}</h1>
-      //   <h1>
-      //     {this.props.elevation}
-      //     {this.props.elevationUnit}
-      //   </h1>
-      //   <h1>{this.props.id}</h1>
-      //   <h1>{this.props.latitude}</h1>
-      //   <h1>{this.props.longitude}</h1>
-      //   <h1>{this.props.maxdate}</h1>
-      //   <h1>{this.props.mindate}</h1>
-      //   <h1>{this.props.name}</h1>
-      // </div>
-      //-----old testing divs-------
       <TableContainer component={Paper}>
         <Table aria-label="weather station information detail table">
           <TableHead>
@@ -280,11 +204,11 @@ class SingleWeatherStationTable extends React.Component<
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? results.slice(
+              ? singleTableResults.slice(
                   page * rowsPerPage,
                   page * rowsPerPage + rowsPerPage
                 )
-              : results
+              : singleTableResults
             ).map((result, idx) => (
               <StyledTableRow key={idx}>
                 <TableCell component="th" scope="row">
@@ -315,7 +239,7 @@ class SingleWeatherStationTable extends React.Component<
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={3}
-                count={results.length}
+                count={singleTableResults.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{
@@ -333,4 +257,5 @@ class SingleWeatherStationTable extends React.Component<
     );
   }
 }
-export default SingleWeatherStationTable;
+
+export default NewSingleTable;
