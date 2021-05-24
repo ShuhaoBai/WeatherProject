@@ -24,7 +24,11 @@ export interface DateRange {
   endDate: Moment | null;
 }
 
-export interface IDatePickerProps {}
+export interface IDatePickerProps {
+  // getSelectedDateRange: (dateRange: DateRange) => void;
+  getSelectednewStartDate: (newStartDate: Moment) => void;
+  getSelectednewEndDate: (newEndDate: Moment) => void;
+}
 
 export interface IDatePickerState {
   focusedInput: any;
@@ -40,6 +44,7 @@ export interface IDatePickerState {
   oldestAllowed: Moment | null;
   /**The most recent date which cna be included in the range */
   newestAllowed: Moment | null;
+  // dateRange: Moment[];
 }
 
 class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
@@ -55,6 +60,7 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
       endDateId: '',
       oldestAllowed: null,
       newestAllowed: null,
+      // dateRange: [],
     };
   }
   isDisabledDate = (dateOption: Moment): boolean => {
@@ -76,12 +82,17 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
     }
   ) {
     if (prevState.startDate !== this.state.startDate) {
-      console.log(this.state.startDate);
+      if (this.state.startDate) {
+        this.props.getSelectednewStartDate(this.state.startDate);
+      }
     }
     if (prevState.endDate !== this.state.endDate) {
-      console.log(this.state.endDate);
+      if (this.state.endDate) {
+        this.props.getSelectednewEndDate(this.state.endDate);
+      }
     }
   }
+
   render() {
     const {
       oldestAllowed,
@@ -100,9 +111,12 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
           endDate={endDate}
           endDateId={endDateId}
           isOutsideRange={this.isDisabledDate}
-          onDatesChange={({ startDate, endDate }) =>
-            this.setState({ startDate, endDate })
-          }
+          onDatesChange={({ startDate, endDate }) => {
+            this.setState({
+              startDate: startDate,
+              endDate: endDate,
+            });
+          }}
           focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
           onFocusChange={(focusedInput) => this.setState({ focusedInput })} // PropTypes.func.isRequired,
           displayFormat="YYYY-MM-DD"

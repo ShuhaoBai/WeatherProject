@@ -11,9 +11,14 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
 import SingleWeatherStationTable from './components/SingleWeatherStationTable';
-import DatePicker from './components/date-picker-airbnb/DatePicker';
+import DatePicker, {
+  DateRange,
+} from './components/date-picker-airbnb/DatePicker';
+import TestingDisplay from './components/date-picker-airbnb/TestingDisplay';
+import moment, { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
+
 export interface IAppProps {}
 export interface IAppState {
   results: IStationsResults[];
@@ -28,6 +33,11 @@ export interface IAppState {
   maxdate: string;
   mindate: string;
   name: string;
+  //----selected Date Range from <DatePicker />
+  startDate: Moment | null;
+  endDate: Moment | null;
+  //----combined date range
+  newDateRange: DateRange | null;
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -45,6 +55,11 @@ class App extends React.Component<IAppProps, IAppState> {
       maxdate: '',
       mindate: '',
       name: '',
+      //selected date range
+      startDate: null,
+      endDate: null,
+      //combined date range
+      newDateRange: null,
     };
   }
 
@@ -149,6 +164,23 @@ class App extends React.Component<IAppProps, IAppState> {
     console.log(fetchSingleStationYealySummaryData);
   };
 
+  getSelectednewStartDate = (newStartDate: Moment) => {
+    this.setState(
+      {
+        startDate: newStartDate,
+      },
+      () => console.log(this.state.startDate)
+    );
+  };
+  getSelectednewEndDate = (newEndDate: Moment) => {
+    this.setState(
+      {
+        endDate: newEndDate,
+      },
+      () => console.log(this.state.endDate)
+    );
+  };
+
   render() {
     return (
       <div>
@@ -174,9 +206,18 @@ class App extends React.Component<IAppProps, IAppState> {
               />
             </Paper>
             <Paper>
-              <DatePicker />
+              <DatePicker
+                getSelectednewStartDate={this.getSelectednewStartDate}
+                getSelectednewEndDate={this.getSelectednewEndDate}
+              />
             </Paper>
           </Grid>
+          <Paper>
+            <TestingDisplay
+              startDate={this.state.startDate}
+              endDate={this.state.endDate}
+            />
+          </Paper>
 
           <Grid item xs={8}>
             <Paper>
