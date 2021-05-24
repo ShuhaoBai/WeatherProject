@@ -68,6 +68,8 @@ class App extends React.Component<IAppProps, IAppState> {
     };
   }
 
+  //TODO - need to unsubscribe all async calls in componentWillUnmount() -- https://stackoverflow.com/questions/52061476/cancel-all-subscriptions-and-asyncs-in-the-componentwillunmount-method-how
+
   //Fetch fixed 25 stations when App first time loaded.
   async componentDidMount() {
     const fetchedStationsData = await fetchStations();
