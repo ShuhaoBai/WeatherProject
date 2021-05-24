@@ -135,6 +135,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
 
 export interface IWeatherStationTableProps {
   results: IStationsResults[];
+  getSelectedStationId: (selectedStationId: string) => void;
 }
 export interface IWeatherStationTableState {
   page: number;
@@ -171,6 +172,12 @@ class WeatherStationTable extends React.Component<
     });
     // setPage(0);
   };
+  handleRowClick = (cellValue: string) => {
+    const stationId = cellValue;
+    console.log(stationId);
+    this.props.getSelectedStationId(stationId);
+  };
+
   render() {
     const { results } = this.props;
     const { page, rowsPerPage } = this.state;
@@ -200,8 +207,16 @@ class WeatherStationTable extends React.Component<
                 )
               : results
             ).map((result, idx) => (
-              <StyledTableRow key={idx}>
-                <TableCell component="th" scope="row">
+              <StyledTableRow
+                key={idx}
+                onClick={() => this.handleRowClick(result.id)} // get current row station id
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  // value={result.name}
+                  // onClick={() => this.handleRowClick(result.name)}
+                >
                   {result.name}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="right">

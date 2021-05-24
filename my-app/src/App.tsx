@@ -1,9 +1,16 @@
 import React from 'react';
-import { fetchStations, fetchStationsWithinRange } from './api';
+import {
+  fetchStations,
+  fetchStationsWithinRange,
+  fetchStationsWithinFixedDateRange,
+  fetchSingleStation,
+  fetchSingleStationYealySummary,
+} from './api';
 import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
+import SingleWeatherStationTable from './components/SingleWeatherStationTable';
 import DatePicker from './components/date-picker-airbnb/DatePicker';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
@@ -11,6 +18,16 @@ export interface IAppProps {}
 export interface IAppState {
   results: IStationsResults[];
   boundsData: L.LatLngBounds[];
+  selectedStationId: string;
+  //----single station data
+  elevation: number;
+  elevationUnit: string;
+  id: string;
+  latitude: string;
+  longitude: string;
+  maxdate: string;
+  mindate: string;
+  name: string;
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -19,6 +36,15 @@ class App extends React.Component<IAppProps, IAppState> {
     this.state = {
       results: [],
       boundsData: [],
+      selectedStationId: '',
+      elevation: 0,
+      elevationUnit: '',
+      id: '',
+      latitude: '',
+      longitude: '',
+      maxdate: '',
+      mindate: '',
+      name: '',
     };
   }
 
@@ -29,6 +55,9 @@ class App extends React.Component<IAppProps, IAppState> {
         results: fetchedStationsData.results,
       });
     }
+    const fetchedStationsDataWithinDateRange =
+      await fetchStationsWithinFixedDateRange();
+    console.log(fetchedStationsDataWithinDateRange);
   }
   componentDidUpdate(
     prevProps: any,
@@ -76,13 +105,73 @@ class App extends React.Component<IAppProps, IAppState> {
     });
   };
 
+  //Get one single station id from WeatherStationTable, by clicking on a table row
+  getSelectedStationId = (selectedStationId: string) => {
+    console.log(selectedStationId);
+    // this.setState({
+    //   selectedStationId: selectedStationId,
+    // });
+    this.startFetchingSingleStationData(selectedStationId);
+
+    //===After user click on table row, fetch clicked station's yearly summary data
+    this.startFetchingSingleStationYearlySummaryData(selectedStationId);
+  };
+
+  //Get one specific weather station data with selectedStationId
+  startFetchingSingleStationData = async (selectedStationId: string) => {
+    const fetchedSingleStationData = await fetchSingleStation(
+      selectedStationId
+    );
+    console.log(fetchedSingleStationData);
+    if (fetchedSingleStationData) {
+      this.setState({
+        elevation: fetchedSingleStationData.data.elevation,
+        elevationUnit: fetchedSingleStationData.data.elevationUnit,
+        id: fetchedSingleStationData.data.id,
+        latitude: fetchedSingleStationData.data.latitude,
+        longitude: fetchedSingleStationData.data.longitude,
+        maxdate: fetchedSingleStationData.data.maxdate,
+        mindate: fetchedSingleStationData.data.mindate,
+        name: fetchedSingleStationData.data.name,
+      });
+    }
+  };
+
+  //Get one specific weather station's yearly data based on selected stationId
+  //TODO - implement the function of manully select date range from DatePicker
+  //TODO - ability to select datasetid and units, then fetch yearly data
+  startFetchingSingleStationYearlySummaryData = async (
+    selectedStationId: string
+  ) => {
+    //Test
+    const fetchSingleStationYealySummaryData =
+      await fetchSingleStationYealySummary(selectedStationId);
+    console.log(fetchSingleStationYealySummaryData);
+  };
+
   render() {
     return (
       <div>
         <Grid container spacing={3}>
           <Grid item xs={4}>
             <Paper>
-              <WeatherStationTable results={this.state.results} />
+              <WeatherStationTable
+                results={this.state.results}
+                getSelectedStationId={this.getSelectedStationId}
+              />
+            </Paper>
+            <Paper>
+              <SingleWeatherStationTable
+                stationId={this.state.selectedStationId}
+                elevation={this.state.elevation}
+                elevationUnit={this.state.elevationUnit}
+                id={this.state.id}
+                latitude={this.state.latitude}
+                longitude={this.state.longitude}
+                maxdate={this.state.maxdate}
+                mindate={this.state.mindate}
+                name={this.state.name}
+              />
             </Paper>
             <Paper>
               <DatePicker />

@@ -26,7 +26,6 @@ class DatePickerNav extends React.Component<
   handleYearChange = (changeEvent: { target: { value: any } }) => {
     const { monthBeingShown, onYearSelect } = this.props;
     const newYear = changeEvent.target.value;
-
     onYearSelect(monthBeingShown, newYear);
   };
   render() {
@@ -42,7 +41,7 @@ class DatePickerNav extends React.Component<
         years.push(year);
       }
     } else {
-      for (let year = currentYear + 20; year > currentYear - 20; year--) {
+      for (let year = currentYear + 30; year > currentYear - 30; year--) {
         years.push(year);
       }
     }
