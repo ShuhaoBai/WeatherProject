@@ -83,29 +83,18 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
   ) {
     if (prevState.startDate !== this.state.startDate) {
       if (this.state.startDate) {
-        console.log(this.state.startDate);
         this.props.getSelectednewStartDate(this.state.startDate);
       }
     }
     if (prevState.endDate !== this.state.endDate) {
       if (this.state.endDate) {
-        console.log(this.state.endDate);
         this.props.getSelectednewEndDate(this.state.endDate);
       }
     }
   }
 
   render() {
-    const {
-      // oldestAllowed,
-      // newestAllowed,
-      startDateId,
-      endDateId,
-      endDate,
-      startDate,
-      // focusedInput,
-    } = this.state;
-    const { oldestAllowed, newestAllowed } = this.props;
+    const { startDateId, endDateId, endDate, startDate } = this.state;
     return (
       <OuterWrapper ref={this.wrapperRef}>
         <DateRangePicker
@@ -114,21 +103,16 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
           endDate={endDate}
           endDateId={endDateId}
           isOutsideRange={this.isDisabledDate}
-          // onDatesChange={({ startDate, endDate }) => {
-          //   this.setState({
-          //     startDate: startDate,
-          //     endDate: endDate,
-          //   });
-          // }}
           onDatesChange={({ startDate, endDate }) => {
             console.log(startDate?.year(), endDate?.year());
+            console.log(startDate?.inspect(), endDate?.inspect());
             this.setState({
               startDate: startDate,
               endDate: endDate,
             });
           }}
-          focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-          onFocusChange={(focusedInput) => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+          focusedInput={this.state.focusedInput}
+          onFocusChange={(focusedInput) => this.setState({ focusedInput })}
           displayFormat="YYYY-MM-DD"
           renderMonthElement={({ month, onYearSelect }) => (
             <DatePickerNav

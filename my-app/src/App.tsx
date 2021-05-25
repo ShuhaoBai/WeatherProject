@@ -2,18 +2,15 @@ import React from 'react';
 import {
   fetchStations,
   fetchStationsWithinRange,
-  fetchSingleStation,
   fetchSingleStationYealySummaryWithStationId,
 } from './api';
 import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
-import SingleWeatherStationTable from './components/SingleWeatherStationTable';
 import NewSingleTable from './components/NewSingleTable';
-import DatePicker from './components/date-picker-airbnb/DatePicker'; // DateRange,
-import TestingDisplay from './components/date-picker-airbnb/TestingDisplay';
-import moment, { Moment } from 'moment';
+import DatePicker from './components/date-picker-airbnb/DatePicker';
+import { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
 import { Button } from '@material-ui/core';
@@ -24,24 +21,8 @@ export interface IAppState {
   results: IStationsResults[];
   boundsData: L.LatLngBounds[];
   selectedStationId: string;
-  //----single station data
-  // elevation: number;
-  // elevationUnit: string;
-  // id: string;
-  // latitude: string;
-  // longitude: string;
-  // maxdate: string;
-  // mindate: string;
-  // name: string;
-  //----selected Date Range from <DatePicker />
-  // startDate?: Moment;
-  // endDate?: Moment;
-  //----combined date range
-  // newDateRange: DateRange | null;
-  //----year search buffer parameters
   bufferStartDate?: Moment;
   bufferEndDate?: Moment;
-  //------results that passed into NewSingleTable
   singleTableResults: IPrecipStationResults[];
   newestAllowed?: Moment;
   oldestAllowed?: Moment;
@@ -54,30 +35,13 @@ class App extends React.Component<IAppProps, IAppState> {
       results: [],
       boundsData: [],
       selectedStationId: '',
-      // elevation: 0,
-      // elevationUnit: '',
-      // id: '',
-      // latitude: '',
-      // longitude: '',
-      // maxdate: '',
-      // mindate: '',
-      // name: '',
-      //selected date range
-      // startDate: undefined,
-      // endDate: undefined,
-      //combined date range
-      // newDateRange: null,
-      //yearly search parameter buffer
       bufferStartDate: undefined,
       bufferEndDate: undefined,
-      //------results that passed into NewSingleTable
       singleTableResults: [],
       newestAllowed: undefined,
       oldestAllowed: undefined,
     };
   }
-
-  //TODO - need to unsubscribe all async calls in componentWillUnmount() -- https://stackoverflow.com/questions/52061476/cancel-all-subscriptions-and-asyncs-in-the-componentwillunmount-method-how
 
   //Fetch fixed 25 stations when App first time loaded.
   async componentDidMount() {
@@ -138,47 +102,18 @@ class App extends React.Component<IAppProps, IAppState> {
 
   //Get one single station id from WeatherStationTable, by clicking on a table row
   getSelectedStationId = (selectedStationId: string) => {
-    // console selected station's id
     this.setState({
       selectedStationId: selectedStationId,
     });
-    // this.startFetchingSingleStationData(selectedStationId);
   };
 
-  //Tessting -- Get one specific weather station data with selectedStationId from the table
-  //and pass fetched data to <SingleWeatherStationTable />
-  //TODO - will remove this method, and render single table with selected date rangea，
-  //这个方法是老方法，之前用来测试用户选中table里一个station之后，fetch一下这个station的信息。
-  //然后把fetch到的信息先存在App的state里，然后用props传给<SingleWeatherStationTable>来展示
-  // startFetchingSingleStationData = async (selectedStationId: string) => {
-  //   const fetchedSingleStationData = await fetchSingleStation(
-  //     selectedStationId
-  //   );
-  //   if (fetchedSingleStationData) {
-  //     this.setState({
-  //       elevation: fetchedSingleStationData.data.elevation,
-  //       elevationUnit: fetchedSingleStationData.data.elevationUnit,
-  //       id: fetchedSingleStationData.data.id,
-  //       latitude: fetchedSingleStationData.data.latitude,
-  //       longitude: fetchedSingleStationData.data.longitude,
-  //       maxdate: fetchedSingleStationData.data.maxdate,
-  //       mindate: fetchedSingleStationData.data.mindate,
-  //       name: fetchedSingleStationData.data.name,
-  //     });
-  //   }
-  // };
-
-  //TODO - implement the function of manully select date range from DatePicker - done
   //TODO - ability to select datasetid and units, then fetch yearly data
-
   getSelectednewStartDate = (newStartDate: Moment) => {
-    console.log(newStartDate);
     this.setState({
       bufferStartDate: newStartDate,
     });
   };
   getSelectednewEndDate = (newEndDate: Moment) => {
-    console.log(newEndDate);
     this.setState({
       bufferEndDate: newEndDate,
     });
@@ -188,17 +123,13 @@ class App extends React.Component<IAppProps, IAppState> {
     newestAllowed: Moment | undefined,
     oldestAllowed: Moment | undefined
   ) => {
-    this.setState(
-      {
-        newestAllowed: newestAllowed,
-        oldestAllowed: oldestAllowed,
-      },
-      () => console.log(newestAllowed, oldestAllowed)
-    );
+    this.setState({
+      newestAllowed: newestAllowed,
+      oldestAllowed: oldestAllowed,
+    });
   };
 
   onClickSubmit = async () => {
-    console.log('search button clicked');
     if (
       this.state.bufferStartDate &&
       this.state.bufferEndDate &&
@@ -210,11 +141,6 @@ class App extends React.Component<IAppProps, IAppState> {
         this.state.bufferEndDate
       );
     }
-
-    // this.setState({
-    //   startDate: this.state.startDate,
-    //   endDate: this.state.endDate,
-    // });
   };
 
   startFetchingSingleStationYearlySummaryWithStationId = async (
@@ -241,6 +167,7 @@ class App extends React.Component<IAppProps, IAppState> {
       results: nextPageResults,
     });
   };
+
   render() {
     return (
       <div>
@@ -249,46 +176,52 @@ class App extends React.Component<IAppProps, IAppState> {
             <Paper>
               <WeatherStationTable
                 results={this.state.results}
-                getSelectedStationId={this.getSelectedStationId}
-                getStationDateRange={this.getStationDateRange}
-                getNextOrPreviousPageStationData={
-                  this.getNextOrPreviousPageStationData
+                getSelectedStationId={(selectedStationId) =>
+                  this.getSelectedStationId(selectedStationId)
+                }
+                getStationDateRange={(newestAllowed, oldestAllowed) =>
+                  this.getStationDateRange(newestAllowed, oldestAllowed)
+                }
+                getNextOrPreviousPageStationData={(nextPageResults) =>
+                  this.getNextOrPreviousPageStationData(nextPageResults)
                 }
               />
             </Paper>
             <Paper>
-              {/* <SingleWeatherStationTable
-                singleTableResults={this.state.singleTableResults}
-                stationId={this.state.selectedStationId}
-                bufferStartDate={this.state.bufferStartDate}
-                bufferEndDate={this.state.bufferEndDate}
-              /> */}
-              <NewSingleTable
-                singleTableResults={this.state.singleTableResults}
-              />
+              {this.state.singleTableResults &&
+                this.state.singleTableResults.length !== 0 && (
+                  <NewSingleTable
+                    singleTableResults={this.state.singleTableResults}
+                  />
+                )}
+              {!this.state.singleTableResults && (
+                <div>
+                  <h1>No Data Available for This Station...</h1>
+                </div>
+              )}
             </Paper>
             <Paper>
               <DatePicker
-                getSelectednewStartDate={this.getSelectednewStartDate}
-                getSelectednewEndDate={this.getSelectednewEndDate}
+                getSelectednewStartDate={(newStartDate) =>
+                  this.getSelectednewStartDate(newStartDate)
+                }
+                getSelectednewEndDate={(newEndDate) =>
+                  this.getSelectednewEndDate(newEndDate)
+                }
                 oldestAllowed={this.state.oldestAllowed}
                 newestAllowed={this.state.newestAllowed}
               />
               <Button onClick={this.onClickSubmit}>Search</Button>
             </Paper>
           </Grid>
-          {/* <Paper>
-            <TestingDisplay
-              startDate={this.state.startDate}
-              endDate={this.state.endDate}
-            />
-          </Paper> */}
 
           <Grid item xs={8}>
             <Paper>
               <MapComponent
                 results={this.state.results}
-                getNewBoundsDataFromParent={this.getNewBoundsDataFromParent}
+                getNewBoundsDataFromParent={(value) =>
+                  this.getNewBoundsDataFromParent(value)
+                }
               />
             </Paper>
           </Grid>

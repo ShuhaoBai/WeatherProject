@@ -178,13 +178,6 @@ class WeatherStationTable extends React.Component<
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    // console.log(newPage);
-    // if (newPage === 4) {
-    //   this.setState({
-    //     pageChangeCount: this.state.pageChangeCount + 1,
-    //     page: 0,
-    //   });
-    // } else {
     this.setState({
       page: newPage,
     });
@@ -200,7 +193,6 @@ class WeatherStationTable extends React.Component<
   };
   //---table related methods
   handleRowClick = async (cellValue: string) => {
-    console.log('User select station row: ' + cellValue);
     const stationId = cellValue;
     this.props.getSelectedStationId(stationId);
     this.startFetchingStationDateRange(stationId);
@@ -246,7 +238,6 @@ class WeatherStationTable extends React.Component<
 
   startFetchingStationDateRange = async (stationId: string) => {
     const fetchedDateRange = await fetchStationDateRange(stationId);
-    console.log(fetchedDateRange);
     this.props.getStationDateRange(
       fetchedDateRange?.convertedMinDate,
       fetchedDateRange?.convertedMaxDate
@@ -320,8 +311,12 @@ class WeatherStationTable extends React.Component<
                   inputProps: { 'aria-label': 'rows per page' },
                   native: true,
                 }}
-                onChangePage={this.handleChangePage}
-                onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                onChangePage={(event, newPage) =>
+                  this.handleChangePage(event, newPage)
+                }
+                onChangeRowsPerPage={(event) =>
+                  this.handleChangeRowsPerPage(event)
+                }
                 ActionsComponent={TablePaginationActions}
               />
             </TableRow>
@@ -330,7 +325,7 @@ class WeatherStationTable extends React.Component<
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={this.onPreviousBtnClick}
+                  onClick={() => this.onPreviousBtnClick()}
                 >
                   Previous Batch
                 </Button>
@@ -339,7 +334,7 @@ class WeatherStationTable extends React.Component<
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={this.onNextBtnClick}
+                  onClick={() => this.onNextBtnClick()}
                 >
                   Next Batch
                 </Button>

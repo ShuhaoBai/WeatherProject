@@ -71,6 +71,7 @@ class MapComponent extends React.Component<
       <MapContainer
         center={[38.9471, -98.3534]}
         zoom={4}
+        maxZoom={12}
         scrollWheelZoom={false}
         style={{ height: 1000 }}
       >
@@ -96,7 +97,9 @@ class MapComponent extends React.Component<
             </Popup>
           </Marker>
         ))}
-        <GrabBounds saveBounds={this.saveBoundsMethod} />
+        <GrabBounds
+          saveBounds={(newBoundCoords) => this.saveBoundsMethod(newBoundCoords)}
+        />
       </MapContainer>
     );
   }

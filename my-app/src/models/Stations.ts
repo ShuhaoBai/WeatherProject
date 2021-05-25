@@ -24,7 +24,6 @@ export default class Stations {
   stationsMetadata: IStationsMetadata;
   stationsResults: IStationsResults[];
 
-  // data is the "stations" json segment
   constructor(data: {
     stationsMetadata: IStationsMetadata;
     stationsResults: IStationsResults[];

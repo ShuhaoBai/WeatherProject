@@ -170,84 +170,96 @@ class NewSingleTable extends React.Component<
   render() {
     const { singleTableResults } = this.props;
     const { page, rowsPerPage } = this.state;
-    const emptyRows =
-      rowsPerPage -
-      Math.min(rowsPerPage, singleTableResults.length - page * rowsPerPage);
-    return (
-      <TableContainer component={Paper}>
-        <Table aria-label="weather station information detail table">
-          <TableHead>
-            <StyledTableRow>
-              <StyledTableCell component="th" scope="row" align="left">
-                Date
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="left">
-                DataType
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="left">
-                Station ID
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="left">
-                Attributes
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="left">
-                Value
-              </StyledTableCell>
-            </StyledTableRow>
-          </TableHead>
-          <TableBody>
-            {(rowsPerPage > 0
-              ? singleTableResults.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-              : singleTableResults
-            ).map((result, idx) => (
-              <StyledTableRow key={idx}>
-                <TableCell component="th" scope="row">
-                  {result.date}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {result.datatype}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {result.station}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {result.attributes}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {result.value}
-                </TableCell>
+    if (!singleTableResults) {
+      return (
+        <div>
+          <h1>No data available for this station...</h1>
+        </div>
+      );
+    } else {
+      const emptyRows =
+        rowsPerPage -
+        Math.min(rowsPerPage, singleTableResults.length - page * rowsPerPage);
+      return (
+        <TableContainer component={Paper}>
+          <Table aria-label="weather station information detail table">
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell component="th" scope="row" align="left">
+                  Date
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="left">
+                  DataType
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="left">
+                  Station ID
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="left">
+                  Attributes
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="left">
+                  Value
+                </StyledTableCell>
               </StyledTableRow>
-            ))}
-            {emptyRows > 0 && (
-              <StyledTableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </StyledTableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={3}
-                count={singleTableResults.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: { 'aria-label': 'rows per page' },
-                  native: true,
-                }}
-                onChangePage={this.handleChangePage}
-                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-    );
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? singleTableResults.slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
+                : singleTableResults
+              ).map((result, idx) => (
+                <StyledTableRow key={idx}>
+                  <TableCell component="th" scope="row">
+                    {result.date}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {result.datatype}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {result.station}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {result.attributes}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="right">
+                    {result.value}
+                  </TableCell>
+                </StyledTableRow>
+              ))}
+              {emptyRows > 0 && (
+                <StyledTableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </StyledTableRow>
+              )}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                  colSpan={3}
+                  count={singleTableResults.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: { 'aria-label': 'rows per page' },
+                    native: true,
+                  }}
+                  onChangePage={(event, newPage) =>
+                    this.handleChangePage(event, newPage)
+                  }
+                  onChangeRowsPerPage={(event) =>
+                    this.handleChangeRowsPerPage(event)
+                  }
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      );
+    }
   }
 }
 
