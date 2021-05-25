@@ -177,12 +177,10 @@ class SingleWeatherStationTable extends React.Component<
   handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    // setRowsPerPage(parseInt(event.target.value, 10));
     this.setState({
       rowsPerPage: parseInt(event.target.value, 10),
       page: 0,
     });
-    // setPage(0);
   };
 
   //---table related methods---
@@ -232,7 +230,6 @@ class SingleWeatherStationTable extends React.Component<
           this.props.bufferEndDate
         );
       }
-      // console.log('inside componentDidUpdate()');
     }
   }
 
@@ -242,21 +239,6 @@ class SingleWeatherStationTable extends React.Component<
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, results.length - page * rowsPerPage);
     return (
-      //-----old testing divs-------
-      // <div>
-      //   <h1>{this.props.stationId}</h1>
-      //   <h1>
-      //     {this.props.elevation}
-      //     {this.props.elevationUnit}
-      //   </h1>
-      //   <h1>{this.props.id}</h1>
-      //   <h1>{this.props.latitude}</h1>
-      //   <h1>{this.props.longitude}</h1>
-      //   <h1>{this.props.maxdate}</h1>
-      //   <h1>{this.props.mindate}</h1>
-      //   <h1>{this.props.name}</h1>
-      // </div>
-      //-----old testing divs-------
       <TableContainer component={Paper}>
         <Table aria-label="weather station information detail table">
           <TableHead>

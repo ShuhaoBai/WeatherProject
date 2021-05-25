@@ -6,6 +6,8 @@ import {
   createStyles,
   withStyles,
 } from '@material-ui/core/styles';
+import { Moment } from 'moment';
+import { fetchStationDateRange } from '../api';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -137,6 +139,10 @@ const StyledTableCell = withStyles((theme: Theme) =>
 export interface IWeatherStationTableProps {
   results: IStationsResults[];
   getSelectedStationId: (selectedStationId: string) => void;
+  getStationDateRange: (
+    newestAllowed: Moment | undefined,
+    oldestAllowed: Moment | undefined
+  ) => void;
 }
 export interface IWeatherStationTableState {
   page: number;
@@ -167,20 +173,26 @@ class WeatherStationTable extends React.Component<
   handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    // setRowsPerPage(parseInt(event.target.value, 10));
     this.setState({
       rowsPerPage: parseInt(event.target.value, 10),
       page: 0,
     });
-    // setPage(0);
   };
   //---table related methods
-  handleRowClick = (cellValue: string) => {
+  handleRowClick = async (cellValue: string) => {
     const stationId = cellValue;
-    console.log(
-      '1. User click on a table row to select a station: ' + stationId
-    );
     this.props.getSelectedStationId(stationId);
+    const fetchedStationDateRange = await this.startFetchingStationDateRange(
+      stationId
+    );
+  };
+
+  startFetchingStationDateRange = async (stationId: string) => {
+    const fetchedDateRange = await fetchStationDateRange(stationId);
+    this.props.getStationDateRange(
+      fetchedDateRange?.convertedMinDate,
+      fetchedDateRange?.convertedMaxDate
+    );
   };
 
   render() {

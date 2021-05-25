@@ -5,8 +5,8 @@ import styled from '@emotion/styled';
 export interface IDatePickerNavProps {
   monthBeingShown: Moment;
   onYearSelect: (monthBeingShown: Moment, newYear: string) => void;
-  newestAllowed: Moment | null;
-  oldestAllowed: Moment | null;
+  newestAllowed: Moment | undefined;
+  oldestAllowed: Moment | undefined;
 }
 export interface IDatePickerNavState {}
 const OuterWrapper = styled.div`

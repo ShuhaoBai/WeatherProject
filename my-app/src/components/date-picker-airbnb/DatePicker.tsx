@@ -25,9 +25,10 @@ export interface DateRange {
 }
 
 export interface IDatePickerProps {
-  // getSelectedDateRange: (dateRange: DateRange) => void;
   getSelectednewStartDate: (newStartDate: Moment) => void;
   getSelectednewEndDate: (newEndDate: Moment) => void;
+  oldestAllowed?: Moment;
+  newestAllowed?: Moment;
 }
 
 export interface IDatePickerState {
@@ -60,7 +61,6 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
       endDateId: '',
       oldestAllowed: null,
       newestAllowed: null,
-      // dateRange: [],
     };
   }
   isDisabledDate = (dateOption: Moment): boolean => {
@@ -124,8 +124,8 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
             <DatePickerNav
               monthBeingShown={month}
               onYearSelect={onYearSelect}
-              oldestAllowed={oldestAllowed}
-              newestAllowed={newestAllowed}
+              oldestAllowed={this.props.oldestAllowed}
+              newestAllowed={this.props.newestAllowed}
             />
           )}
           numberOfMonths={2}

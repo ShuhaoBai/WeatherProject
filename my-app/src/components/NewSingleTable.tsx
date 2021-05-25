@@ -131,12 +131,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
     },
   })
 )(TableCell);
-//===================
-//===================
-//===================
-//===================
-//===================
-//===================
+
 export interface INewSingleTableProps {
   singleTableResults: IPrecipStationResults[];
 }
@@ -167,12 +162,10 @@ class NewSingleTable extends React.Component<
   handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    // setRowsPerPage(parseInt(event.target.value, 10));
     this.setState({
       rowsPerPage: parseInt(event.target.value, 10),
       page: 0,
     });
-    // setPage(0);
   };
   render() {
     const { singleTableResults } = this.props;

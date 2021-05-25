@@ -3,6 +3,7 @@ import {
   fetchStations,
   fetchStationsWithinRange,
   fetchSingleStation,
+  fetchSingleStationYealySummaryWithStationId,
 } from './api';
 import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
@@ -44,6 +45,8 @@ export interface IAppState {
   bufferEndDate?: Moment;
   //------results that passed into NewSingleTable
   singleTableResults: IPrecipStationResults[];
+  newestAllowed?: Moment;
+  oldestAllowed?: Moment;
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -71,6 +74,8 @@ class App extends React.Component<IAppProps, IAppState> {
       bufferEndDate: undefined,
       //------results that passed into NewSingleTable
       singleTableResults: [],
+      newestAllowed: undefined,
+      oldestAllowed: undefined,
     };
   }
 
@@ -136,19 +141,9 @@ class App extends React.Component<IAppProps, IAppState> {
   //Get one single station id from WeatherStationTable, by clicking on a table row
   getSelectedStationId = (selectedStationId: string) => {
     // console selected station's id
-    console.log(
-      '2. Receive the user selected station at App.tsx: ' + selectedStationId
-    );
-    this.setState(
-      {
-        selectedStationId: selectedStationId,
-      },
-      () =>
-        console.log(
-          '3. Set selected staion id to App.tsx state: ' +
-            this.state.selectedStationId
-        )
-    );
+    this.setState({
+      selectedStationId: selectedStationId,
+    });
     // this.startFetchingSingleStationData(selectedStationId);
   };
 
@@ -179,34 +174,58 @@ class App extends React.Component<IAppProps, IAppState> {
   //TODO - ability to select datasetid and units, then fetch yearly data
 
   getSelectednewStartDate = (newStartDate: Moment) => {
-    this.setState(
-      {
-        startDate: newStartDate,
-      },
-      () => console.log(this.state.startDate)
-    );
+    this.setState({
+      startDate: newStartDate,
+    });
   };
   getSelectednewEndDate = (newEndDate: Moment) => {
-    this.setState(
-      {
-        endDate: newEndDate,
-      },
-      () => console.log(this.state.endDate)
-    );
+    this.setState({
+      endDate: newEndDate,
+    });
   };
-  onClickSubmit = () => {
-    this.setState(
-      {
-        bufferStartDate: this.state.startDate,
-        bufferEndDate: this.state.endDate,
-      },
-      () =>
-        console.log(
-          //TODO - need to find better way to format moment
-          this.state.bufferStartDate?.format().slice(0, 10),
-          this.state.bufferEndDate?.format().slice(0, 10)
-        )
-    );
+
+  getStationDateRange = (
+    newestAllowed: Moment | undefined,
+    oldestAllowed: Moment | undefined
+  ) => {
+    this.setState({
+      newestAllowed: newestAllowed,
+      oldestAllowed: oldestAllowed,
+    });
+  };
+
+  onClickSubmit = async () => {
+    if (this.state.startDate && this.state.endDate) {
+      await this.startFetchingSingleStationYearlySummaryWithStationId(
+        this.state.selectedStationId,
+        this.state.startDate,
+        this.state.endDate
+      );
+    }
+
+    this.setState({
+      startDate: this.state.startDate,
+      endDate: this.state.endDate,
+    });
+  };
+
+  startFetchingSingleStationYearlySummaryWithStationId = async (
+    stationId: string,
+    bufferStartDate: Moment,
+    bufferEndDate: Moment
+  ) => {
+    const fetchedSingleStationYealySummaryDataWithStationId =
+      await fetchSingleStationYealySummaryWithStationId(
+        stationId,
+        bufferStartDate,
+        bufferEndDate
+      );
+    if (fetchedSingleStationYealySummaryDataWithStationId) {
+      this.setState({
+        singleTableResults:
+          fetchedSingleStationYealySummaryDataWithStationId.results,
+      });
+    }
   };
 
   render() {
@@ -218,6 +237,7 @@ class App extends React.Component<IAppProps, IAppState> {
               <WeatherStationTable
                 results={this.state.results}
                 getSelectedStationId={this.getSelectedStationId}
+                getStationDateRange={this.getStationDateRange}
               />
             </Paper>
             <Paper>
@@ -235,6 +255,8 @@ class App extends React.Component<IAppProps, IAppState> {
               <DatePicker
                 getSelectednewStartDate={this.getSelectednewStartDate}
                 getSelectednewEndDate={this.getSelectednewEndDate}
+                oldestAllowed={this.state.oldestAllowed}
+                newestAllowed={this.state.newestAllowed}
               />
               <Button onClick={this.onClickSubmit}>Search</Button>
             </Paper>
