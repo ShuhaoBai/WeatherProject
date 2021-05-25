@@ -86,13 +86,15 @@ export const fetchStationDateRange = async (stationId: string) => {
     const convertedMinDate = moment(maxdate);
     const convertedMaxDate = moment(mindate);
     // console.log(typeof mindate);
+    console.log(convertedMinDate);
+    console.log(convertedMaxDate);
     return { convertedMinDate, convertedMaxDate };
   } catch (error) {
     console.log(error);
   }
 };
 
-export const fetchNextPageStation = async (offset: number) => {
+export const fetchNextOrPreviousPageStation = async (offset: number) => {
   const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?offset=${offset}`;
   try {
     const fetchedStationsData = await axios.get(`${url}`, {

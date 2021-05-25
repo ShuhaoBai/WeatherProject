@@ -11,9 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import WeatherStationTable from './components/WeatherStationTable';
 import SingleWeatherStationTable from './components/SingleWeatherStationTable';
 import NewSingleTable from './components/NewSingleTable';
-import DatePicker, {
-  DateRange,
-} from './components/date-picker-airbnb/DatePicker';
+import DatePicker from './components/date-picker-airbnb/DatePicker'; // DateRange,
 import TestingDisplay from './components/date-picker-airbnb/TestingDisplay';
 import moment, { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
@@ -36,10 +34,10 @@ export interface IAppState {
   // mindate: string;
   // name: string;
   //----selected Date Range from <DatePicker />
-  startDate?: Moment;
-  endDate?: Moment;
+  // startDate?: Moment;
+  // endDate?: Moment;
   //----combined date range
-  newDateRange: DateRange | null;
+  // newDateRange: DateRange | null;
   //----year search buffer parameters
   bufferStartDate?: Moment;
   bufferEndDate?: Moment;
@@ -65,10 +63,10 @@ class App extends React.Component<IAppProps, IAppState> {
       // mindate: '',
       // name: '',
       //selected date range
-      startDate: undefined,
-      endDate: undefined,
+      // startDate: undefined,
+      // endDate: undefined,
       //combined date range
-      newDateRange: null,
+      // newDateRange: null,
       //yearly search parameter buffer
       bufferStartDate: undefined,
       bufferEndDate: undefined,
@@ -174,13 +172,15 @@ class App extends React.Component<IAppProps, IAppState> {
   //TODO - ability to select datasetid and units, then fetch yearly data
 
   getSelectednewStartDate = (newStartDate: Moment) => {
+    console.log(newStartDate);
     this.setState({
-      startDate: newStartDate,
+      bufferStartDate: newStartDate,
     });
   };
   getSelectednewEndDate = (newEndDate: Moment) => {
+    console.log(newEndDate);
     this.setState({
-      endDate: newEndDate,
+      bufferEndDate: newEndDate,
     });
   };
 
@@ -200,21 +200,21 @@ class App extends React.Component<IAppProps, IAppState> {
   onClickSubmit = async () => {
     console.log('search button clicked');
     if (
-      this.state.startDate &&
-      this.state.endDate &&
+      this.state.bufferStartDate &&
+      this.state.bufferEndDate &&
       this.state.selectedStationId
     ) {
       await this.startFetchingSingleStationYearlySummaryWithStationId(
         this.state.selectedStationId,
-        this.state.startDate,
-        this.state.endDate
+        this.state.bufferStartDate,
+        this.state.bufferEndDate
       );
     }
 
-    this.setState({
-      startDate: this.state.startDate,
-      endDate: this.state.endDate,
-    });
+    // this.setState({
+    //   startDate: this.state.startDate,
+    //   endDate: this.state.endDate,
+    // });
   };
 
   startFetchingSingleStationYearlySummaryWithStationId = async (
@@ -236,7 +236,7 @@ class App extends React.Component<IAppProps, IAppState> {
     }
   };
 
-  getNextPageStationData = (nextPageResults: IStationsResults[]) => {
+  getNextOrPreviousPageStationData = (nextPageResults: IStationsResults[]) => {
     this.setState({
       results: nextPageResults,
     });
@@ -251,7 +251,9 @@ class App extends React.Component<IAppProps, IAppState> {
                 results={this.state.results}
                 getSelectedStationId={this.getSelectedStationId}
                 getStationDateRange={this.getStationDateRange}
-                getNextPageStationData={this.getNextPageStationData}
+                getNextOrPreviousPageStationData={
+                  this.getNextOrPreviousPageStationData
+                }
               />
             </Paper>
             <Paper>
@@ -275,12 +277,12 @@ class App extends React.Component<IAppProps, IAppState> {
               <Button onClick={this.onClickSubmit}>Search</Button>
             </Paper>
           </Grid>
-          <Paper>
+          {/* <Paper>
             <TestingDisplay
               startDate={this.state.startDate}
               endDate={this.state.endDate}
             />
-          </Paper>
+          </Paper> */}
 
           <Grid item xs={8}>
             <Paper>

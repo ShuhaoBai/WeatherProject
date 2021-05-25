@@ -19,10 +19,10 @@ const OuterWrapper = styled.div`
   }
 `;
 
-export interface DateRange {
-  startDate: Moment | null;
-  endDate: Moment | null;
-}
+// export interface DateRange {
+//   startDate: Moment | null;
+//   endDate: Moment | null;
+// }
 
 export interface IDatePickerProps {
   getSelectednewStartDate: (newStartDate: Moment) => void;
@@ -83,11 +83,13 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
   ) {
     if (prevState.startDate !== this.state.startDate) {
       if (this.state.startDate) {
+        console.log(this.state.startDate);
         this.props.getSelectednewStartDate(this.state.startDate);
       }
     }
     if (prevState.endDate !== this.state.endDate) {
       if (this.state.endDate) {
+        console.log(this.state.endDate);
         this.props.getSelectednewEndDate(this.state.endDate);
       }
     }
@@ -95,15 +97,15 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
 
   render() {
     const {
-      oldestAllowed,
-      newestAllowed,
+      // oldestAllowed,
+      // newestAllowed,
       startDateId,
       endDateId,
       endDate,
       startDate,
-      focusedInput,
+      // focusedInput,
     } = this.state;
-    // const { oldestAllowed, newestAllowed } = this.props;
+    const { oldestAllowed, newestAllowed } = this.props;
     return (
       <OuterWrapper ref={this.wrapperRef}>
         <DateRangePicker
@@ -119,6 +121,7 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
           //   });
           // }}
           onDatesChange={({ startDate, endDate }) => {
+            console.log(startDate?.year(), endDate?.year());
             this.setState({
               startDate: startDate,
               endDate: endDate,

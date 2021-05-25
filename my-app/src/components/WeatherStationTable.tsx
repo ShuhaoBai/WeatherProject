@@ -7,7 +7,7 @@ import {
   withStyles,
 } from '@material-ui/core/styles';
 import { Moment } from 'moment';
-import { fetchStationDateRange, fetchNextPageStation } from '../api';
+import { fetchStationDateRange, fetchNextOrPreviousPageStation } from '../api';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -144,7 +144,9 @@ export interface IWeatherStationTableProps {
     newestAllowed: Moment | undefined,
     oldestAllowed: Moment | undefined
   ) => void;
-  getNextPageStationData: (nextPageResults: IStationsResults[]) => void;
+  getNextOrPreviousPageStationData: (
+    nextPageResults: IStationsResults[]
+  ) => void;
 }
 export interface IWeatherStationTableState {
   page: number;
@@ -168,7 +170,7 @@ class WeatherStationTable extends React.Component<
   componentDidUpdate(prevProps: any, prevState: { pageChangeCount: number }) {
     if (prevState.pageChangeCount !== this.state.pageChangeCount) {
       let updatedPageCount = this.state.pageChangeCount * 25;
-      this.startFetchingNextPageStation(updatedPageCount);
+      this.startFetchingNextOrPreviousPageStation(updatedPageCount);
     }
   }
   //---table related methods
@@ -201,33 +203,50 @@ class WeatherStationTable extends React.Component<
     console.log('User select station row: ' + cellValue);
     const stationId = cellValue;
     this.props.getSelectedStationId(stationId);
-    const fetchedStationDateRange = await this.startFetchingStationDateRange(
-      stationId
-    );
+    this.startFetchingStationDateRange(stationId);
   };
 
   onPreviousBtnClick = () => {
     if (this.state.pageChangeCount > 0) {
-      this.setState({
-        pageChangeCount: this.state.pageChangeCount - 1,
-      });
+      this.setState(
+        {
+          pageChangeCount: this.state.pageChangeCount - 1,
+        },
+        () =>
+          this.startFetchingNextOrPreviousPageStation(
+            this.state.pageChangeCount * 25
+          )
+      );
+    } else {
+      alert('Reached the beginning of the data list...');
     }
   };
   onNextBtnClick = () => {
-    this.setState({
-      pageChangeCount: this.state.pageChangeCount + 1,
-    });
+    this.setState(
+      {
+        pageChangeCount: this.state.pageChangeCount + 1,
+      },
+      () =>
+        this.startFetchingNextOrPreviousPageStation(
+          this.state.pageChangeCount * 25
+        )
+    );
   };
 
-  startFetchingNextPageStation = async (offset: number) => {
-    const fetchedNextPageStationData = await fetchNextPageStation(offset);
+  startFetchingNextOrPreviousPageStation = async (offset: number) => {
+    const fetchedNextPageStationData = await fetchNextOrPreviousPageStation(
+      offset
+    );
     if (fetchedNextPageStationData) {
-      this.props.getNextPageStationData(fetchedNextPageStationData.results);
+      this.props.getNextOrPreviousPageStationData(
+        fetchedNextPageStationData.results
+      );
     }
   };
 
   startFetchingStationDateRange = async (stationId: string) => {
     const fetchedDateRange = await fetchStationDateRange(stationId);
+    console.log(fetchedDateRange);
     this.props.getStationDateRange(
       fetchedDateRange?.convertedMinDate,
       fetchedDateRange?.convertedMaxDate
