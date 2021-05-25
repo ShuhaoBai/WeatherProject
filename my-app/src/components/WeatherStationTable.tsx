@@ -7,7 +7,7 @@ import {
   withStyles,
 } from '@material-ui/core/styles';
 import { Moment } from 'moment';
-import { fetchStationDateRange } from '../api';
+import { fetchStationDateRange, fetchNextPageStation } from '../api';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -23,6 +23,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { IStationsResults } from '../models/Stations';
+import { Button } from '@material-ui/core';
 
 //---table related methods
 const useStyles1 = makeStyles((theme: Theme) =>
@@ -143,10 +144,12 @@ export interface IWeatherStationTableProps {
     newestAllowed: Moment | undefined,
     oldestAllowed: Moment | undefined
   ) => void;
+  getNextPageStationData: (nextPageResults: IStationsResults[]) => void;
 }
 export interface IWeatherStationTableState {
   page: number;
   rowsPerPage: number;
+  pageChangeCount: number;
 }
 class WeatherStationTable extends React.Component<
   IWeatherStationTableProps,
@@ -159,16 +162,31 @@ class WeatherStationTable extends React.Component<
     this.state = {
       page: 0,
       rowsPerPage: 5,
+      pageChangeCount: 0,
     };
+  }
+  componentDidUpdate(prevProps: any, prevState: { pageChangeCount: number }) {
+    if (prevState.pageChangeCount !== this.state.pageChangeCount) {
+      let updatedPageCount = this.state.pageChangeCount * 25;
+      this.startFetchingNextPageStation(updatedPageCount);
+    }
   }
   //---table related methods
   handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
+    // console.log(newPage);
+    // if (newPage === 4) {
+    //   this.setState({
+    //     pageChangeCount: this.state.pageChangeCount + 1,
+    //     page: 0,
+    //   });
+    // } else {
     this.setState({
       page: newPage,
     });
+    // }
   };
   handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -180,11 +198,32 @@ class WeatherStationTable extends React.Component<
   };
   //---table related methods
   handleRowClick = async (cellValue: string) => {
+    console.log('User select station row: ' + cellValue);
     const stationId = cellValue;
     this.props.getSelectedStationId(stationId);
     const fetchedStationDateRange = await this.startFetchingStationDateRange(
       stationId
     );
+  };
+
+  onPreviousBtnClick = () => {
+    if (this.state.pageChangeCount > 0) {
+      this.setState({
+        pageChangeCount: this.state.pageChangeCount - 1,
+      });
+    }
+  };
+  onNextBtnClick = () => {
+    this.setState({
+      pageChangeCount: this.state.pageChangeCount + 1,
+    });
+  };
+
+  startFetchingNextPageStation = async (offset: number) => {
+    const fetchedNextPageStationData = await fetchNextPageStation(offset);
+    if (fetchedNextPageStationData) {
+      this.props.getNextPageStationData(fetchedNextPageStationData.results);
+    }
   };
 
   startFetchingStationDateRange = async (stationId: string) => {
@@ -266,6 +305,26 @@ class WeatherStationTable extends React.Component<
                 onChangeRowsPerPage={this.handleChangeRowsPerPage}
                 ActionsComponent={TablePaginationActions}
               />
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={this.onPreviousBtnClick}
+                >
+                  Previous Batch
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={this.onNextBtnClick}
+                >
+                  Next Batch
+                </Button>
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>

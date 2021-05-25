@@ -103,6 +103,7 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
       startDate,
       focusedInput,
     } = this.state;
+    // const { oldestAllowed, newestAllowed } = this.props;
     return (
       <OuterWrapper ref={this.wrapperRef}>
         <DateRangePicker
@@ -111,6 +112,12 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
           endDate={endDate}
           endDateId={endDateId}
           isOutsideRange={this.isDisabledDate}
+          // onDatesChange={({ startDate, endDate }) => {
+          //   this.setState({
+          //     startDate: startDate,
+          //     endDate: endDate,
+          //   });
+          // }}
           onDatesChange={({ startDate, endDate }) => {
             this.setState({
               startDate: startDate,

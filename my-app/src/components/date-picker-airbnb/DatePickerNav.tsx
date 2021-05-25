@@ -32,6 +32,7 @@ class DatePickerNav extends React.Component<
     const { monthBeingShown, newestAllowed, oldestAllowed } = this.props;
     const currentYear = monthBeingShown.year();
     let years = [];
+    // console.log(newestAllowed);
     if (newestAllowed && oldestAllowed) {
       for (
         let year = newestAllowed.year();

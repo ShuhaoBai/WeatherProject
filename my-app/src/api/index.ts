@@ -91,3 +91,18 @@ export const fetchStationDateRange = async (stationId: string) => {
     console.log(error);
   }
 };
+
+export const fetchNextPageStation = async (offset: number) => {
+  const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?offset=${offset}`;
+  try {
+    const fetchedStationsData = await axios.get(`${url}`, {
+      headers: { token: `${api_token}` },
+    });
+    const {
+      data: { results },
+    } = fetchedStationsData;
+    return { results };
+  } catch (error) {
+    console.log(error);
+  }
+};

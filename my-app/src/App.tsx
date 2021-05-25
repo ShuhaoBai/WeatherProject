@@ -188,14 +188,22 @@ class App extends React.Component<IAppProps, IAppState> {
     newestAllowed: Moment | undefined,
     oldestAllowed: Moment | undefined
   ) => {
-    this.setState({
-      newestAllowed: newestAllowed,
-      oldestAllowed: oldestAllowed,
-    });
+    this.setState(
+      {
+        newestAllowed: newestAllowed,
+        oldestAllowed: oldestAllowed,
+      },
+      () => console.log(newestAllowed, oldestAllowed)
+    );
   };
 
   onClickSubmit = async () => {
-    if (this.state.startDate && this.state.endDate) {
+    console.log('search button clicked');
+    if (
+      this.state.startDate &&
+      this.state.endDate &&
+      this.state.selectedStationId
+    ) {
       await this.startFetchingSingleStationYearlySummaryWithStationId(
         this.state.selectedStationId,
         this.state.startDate,
@@ -228,6 +236,11 @@ class App extends React.Component<IAppProps, IAppState> {
     }
   };
 
+  getNextPageStationData = (nextPageResults: IStationsResults[]) => {
+    this.setState({
+      results: nextPageResults,
+    });
+  };
   render() {
     return (
       <div>
@@ -238,6 +251,7 @@ class App extends React.Component<IAppProps, IAppState> {
                 results={this.state.results}
                 getSelectedStationId={this.getSelectedStationId}
                 getStationDateRange={this.getStationDateRange}
+                getNextPageStationData={this.getNextPageStationData}
               />
             </Paper>
             <Paper>
