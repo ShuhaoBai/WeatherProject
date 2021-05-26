@@ -27,7 +27,7 @@ function GrabBounds({ saveBounds }: IGrabBoundsProps) {
 
 export interface IMapComponentProps {
   results: IStationsResults[];
-  getNewBoundsDataFromParent: (val: L.LatLngBounds[]) => void;
+  getNewBoundsDataFromMap: (val: L.LatLngBounds[]) => void;
 }
 export interface IMapComponentState {
   boundsData: L.LatLngBounds[];
@@ -55,13 +55,13 @@ class MapComponent extends React.Component<
       this.setState({
         boundsData: this.state.boundsData,
       });
-      this.handleParentMethod();
+      this.sendOutNewBoundsData();
     }
   }
 
-  handleParentMethod = () => {
+  sendOutNewBoundsData = () => {
     if (this.state.boundsData) {
-      this.props.getNewBoundsDataFromParent(this.state.boundsData);
+      this.props.getNewBoundsDataFromMap(this.state.boundsData);
     }
   };
 
@@ -70,10 +70,10 @@ class MapComponent extends React.Component<
     return (
       <MapContainer
         center={[31.5702, -85.2482]}
-        zoom={7}
+        zoom={6}
         maxZoom={12}
         scrollWheelZoom={false}
-        style={{ height: 1000 }}
+        style={{ height: 1100, width: 'auto' }}
       >
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -98,7 +98,8 @@ class MapComponent extends React.Component<
           </Marker>
         ))}
         <GrabBounds
-          saveBounds={(newBoundCoords) => this.saveBoundsMethod(newBoundCoords)}
+          // saveBounds={(newBoundCoords) => this.saveBoundsMethod(newBoundCoords)}
+          saveBounds={this.saveBoundsMethod}
         />
       </MapContainer>
     );

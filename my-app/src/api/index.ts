@@ -17,19 +17,6 @@ export const fetchStations = async () => {
   }
 };
 
-export const fetchSingleStation = async (stationId: string) => {
-  const url = 'https://www.ncdc.noaa.gov/cdo-web/api/v2/stations';
-  try {
-    const fetchedSingleStationData = await axios.get(`${url}/${stationId}`, {
-      headers: { token: `${api_token}` },
-    });
-    const { data } = fetchedSingleStationData;
-    return { data };
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 // Fetch available data type for the selected station
 export const fetchSingleStationAvailableDataType = async (
   selectedStationId: string

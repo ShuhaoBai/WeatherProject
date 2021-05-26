@@ -1,22 +1,22 @@
 import React from 'react';
+import * as L from 'leaflet';
 import {
   fetchStations,
   fetchStationsWithinRange,
   fetchSingleStationYealySummaryWithStationId,
 } from './api';
-import MapComponent from './components/MapComponent';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import WeatherStationTable from './components/WeatherStationTable';
-import NewSingleTable from './components/NewSingleTable';
-import DatePicker from './components/date-picker-airbnb/DatePicker';
+import { Button } from '@material-ui/core';
 import { Moment } from 'moment';
 import { IStationsResults } from './models/Stations';
-import * as L from 'leaflet';
-import { Button } from '@material-ui/core';
 import { IPrecipStationResults } from './models/PrecipStation';
 import { IStationDataTypeResults } from './models/StationDataType';
 import SimpleList from './components/list/SimpleList';
+import WeatherStationTable from './components/WeatherStationTable';
+import NewSingleTable from './components/NewSingleTable';
+import DatePicker from './components/date-picker-airbnb/DatePicker';
+import MapComponent from './components/MapComponent';
 
 export interface IAppProps {}
 export interface IAppState {
@@ -38,16 +38,16 @@ class App extends React.Component<IAppProps, IAppState> {
     super(props);
     this.state = {
       results: [],
+      singleTableResults: [],
+      avaiableDataTypeResults: [],
       boundsData: [],
       selectedStationId: '',
       selectedStationName: '',
+      menuItemValue: '',
       bufferStartDate: undefined,
       bufferEndDate: undefined,
-      singleTableResults: [],
-      avaiableDataTypeResults: [],
       newestAllowed: undefined,
       oldestAllowed: undefined,
-      menuItemValue: '',
     };
   }
 
@@ -70,6 +70,7 @@ class App extends React.Component<IAppProps, IAppState> {
       this.handleZoomSearch();
     }
   }
+
   handleZoomSearch = () => {
     let southWest_lat = +this.state.boundsData[0].getSouthWest().lat.toFixed(4);
     let southWest_lng = +this.state.boundsData[0].getSouthWest().lng.toFixed(4);
@@ -102,7 +103,7 @@ class App extends React.Component<IAppProps, IAppState> {
     }
   };
   //Get new bounds corner data when users pan/zoom the map, from <MapComponent />
-  getNewBoundsDataFromParent = (value: L.LatLngBounds[]) => {
+  getNewBoundsDataFromMap = (value: L.LatLngBounds[]) => {
     this.setState({
       boundsData: value,
     });
@@ -206,13 +207,16 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   render() {
-    let simpleList;
+    let dataSetIdList;
     let newSingleTable;
-    if (
+
+    if (!this.state.selectedStationName) {
+      dataSetIdList = null;
+    } else if (
       this.state.avaiableDataTypeResults &&
       this.state.avaiableDataTypeResults.length > 0
     ) {
-      simpleList = (
+      dataSetIdList = (
         <SimpleList
           avaiableDataTypeResults={this.state.avaiableDataTypeResults}
           getMenuItemValue={(menuItemValue) =>
@@ -221,21 +225,30 @@ class App extends React.Component<IAppProps, IAppState> {
         />
       );
     } else {
-      simpleList = (
+      dataSetIdList = (
         <div>
-          <h1>No Dataset ID available for this station</h1>
+          <span>No Dataset ID available for this station</span>
         </div>
       );
     }
 
     if (
+      !this.state.selectedStationName ||
+      !this.state.singleTableResults ||
+      !this.state.avaiableDataTypeResults
+    ) {
+      newSingleTable = null;
+    } else if (
       this.state.singleTableResults &&
       this.state.singleTableResults.length > 0
     ) {
       newSingleTable = (
         <NewSingleTable singleTableResults={this.state.singleTableResults} />
       );
-    } else {
+    } else if (
+      this.state.selectedStationName &&
+      !this.state.avaiableDataTypeResults
+    ) {
       newSingleTable = (
         <div>
           <h1>No Data Available</h1>
@@ -246,7 +259,7 @@ class App extends React.Component<IAppProps, IAppState> {
       <div>
         <Grid container spacing={3}>
           <Grid item xs={4}>
-            <Paper>
+            <Paper variant="outlined">
               <WeatherStationTable
                 results={this.state.results}
                 getSelectedStationIdAndName={(
@@ -269,17 +282,20 @@ class App extends React.Component<IAppProps, IAppState> {
                 }
               />
             </Paper>
-            <Paper>
+            <Paper variant="outlined">
               {this.state.selectedStationName ? (
-                <h1>Selected Station: {this.state.selectedStationName}</h1>
+                <div>
+                  <h3>Selected Station Name</h3>
+                  <h2>{this.state.selectedStationName}</h2>
+                </div>
               ) : (
-                <h1>Please select a station from above table.</h1>
+                <h3>Please select a station from above table.</h3>
               )}
             </Paper>
-            <Paper>{simpleList}</Paper>
-            <Paper>
-              {this.state.avaiableDataTypeResults && (
-                <div>
+            <Paper variant="outlined">{dataSetIdList}</Paper>
+            {this.state.avaiableDataTypeResults && (
+              <Grid container spacing={6}>
+                <Grid item xs={6}>
                   <DatePicker
                     getSelectednewStartDate={(newStartDate) =>
                       this.getSelectednewStartDate(newStartDate)
@@ -290,19 +306,23 @@ class App extends React.Component<IAppProps, IAppState> {
                     oldestAllowed={this.state.oldestAllowed}
                     newestAllowed={this.state.newestAllowed}
                   />
-                  <Button onClick={this.onClickSubmit}>Search</Button>
-                </div>
-              )}
-            </Paper>
-            <Paper>{newSingleTable}</Paper>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button variant="contained" onClick={this.onClickSubmit}>
+                    Search
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+            <Paper variant="outlined">{newSingleTable}</Paper>
           </Grid>
 
           <Grid item xs={8}>
-            <Paper>
+            <Paper variant="outlined">
               <MapComponent
                 results={this.state.results}
-                getNewBoundsDataFromParent={(value) =>
-                  this.getNewBoundsDataFromParent(value)
+                getNewBoundsDataFromMap={(value) =>
+                  this.getNewBoundsDataFromMap(value)
                 }
               />
             </Paper>

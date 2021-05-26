@@ -1,5 +1,10 @@
 import React from 'react';
-import { Theme, createStyles, withStyles } from '@material-ui/core/styles';
+import {
+  withStyles,
+  WithStyles,
+  createStyles,
+  Theme,
+} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -12,29 +17,29 @@ import Paper from '@material-ui/core/Paper';
 import { IPrecipStationResults } from '../models/PrecipStation';
 import TablePaginationActions from './table-core/TablePaginationActions';
 
-const StyledTableRow = withStyles((theme: Theme) =>
+const styles = ({ palette }: Theme) =>
   createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  })
-)(TableRow);
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
+    headerCell: {
+      backgroundColor: palette.common.black,
+      color: palette.common.white,
+      fontSize: 16,
       width: '100%',
     },
-  })
-)(TableCell);
+    tableRow: {
+      '&:nth-of-type(odd)': {
+        backgroundColor: palette.action.hover,
+      },
+    },
+    tableCell: {
+      width: 160,
+    },
+    paginationCell: {
+      width: '100%',
+    },
+    emptyRow: {},
+  });
 
-export interface INewSingleTableProps {
+export interface INewSingleTableProps extends WithStyles<typeof styles> {
   singleTableResults: IPrecipStationResults[];
 }
 export interface INewSingleTableState {
@@ -70,7 +75,7 @@ class NewSingleTable extends React.Component<
     });
   };
   render() {
-    const { singleTableResults } = this.props;
+    const { singleTableResults, classes } = this.props;
     const { page, rowsPerPage } = this.state;
     if (!singleTableResults) {
       return (
@@ -86,23 +91,48 @@ class NewSingleTable extends React.Component<
         <TableContainer component={Paper}>
           <Table aria-label="weather station information detail table">
             <TableHead>
-              <StyledTableRow>
-                <StyledTableCell component="th" scope="row" align="left">
+              <TableRow>
+                <TableCell
+                  className={classes.headerCell}
+                  component="th"
+                  scope="row"
+                  align="left"
+                >
                   Date
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="left">
+                </TableCell>
+                <TableCell
+                  className={classes.headerCell}
+                  component="th"
+                  scope="row"
+                  align="left"
+                >
                   DataType
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="left">
+                </TableCell>
+                <TableCell
+                  className={classes.headerCell}
+                  component="th"
+                  scope="row"
+                  align="left"
+                >
                   Station ID
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="left">
+                </TableCell>
+                <TableCell
+                  className={classes.headerCell}
+                  component="th"
+                  scope="row"
+                  align="left"
+                >
                   Attributes
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="left">
+                </TableCell>
+                <TableCell
+                  className={classes.headerCell}
+                  component="th"
+                  scope="row"
+                  align="left"
+                >
                   Value
-                </StyledTableCell>
-              </StyledTableRow>
+                </TableCell>
+              </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
@@ -112,35 +142,39 @@ class NewSingleTable extends React.Component<
                   )
                 : singleTableResults
               ).map((result, idx) => (
-                <StyledTableRow key={idx}>
-                  <TableCell component="th" scope="row">
+                <TableRow className={classes.tableRow} key={idx}>
+                  <TableCell
+                    className={classes.tableCell}
+                    component="th"
+                    scope="row"
+                  >
                     {result.date}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
+                  <TableCell className={classes.tableCell} align="right">
                     {result.datatype}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
+                  <TableCell className={classes.tableCell} align="right">
                     {result.station}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
+                  <TableCell className={classes.tableCell} align="right">
                     {result.attributes}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="right">
+                  <TableCell className={classes.tableCell} align="right">
                     {result.value}
                   </TableCell>
-                </StyledTableRow>
+                </TableRow>
               ))}
               {emptyRows > 0 && (
-                <StyledTableRow style={{ height: 53 * emptyRows }}>
+                <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />
-                </StyledTableRow>
+                </TableRow>
               )}
             </TableBody>
             <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                  colSpan={3}
+                  colSpan={5}
                   count={singleTableResults.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
@@ -165,4 +199,4 @@ class NewSingleTable extends React.Component<
   }
 }
 
-export default NewSingleTable;
+export default withStyles(styles)(NewSingleTable);

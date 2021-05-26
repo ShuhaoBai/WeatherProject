@@ -1,5 +1,10 @@
 import React from 'react';
-import { Theme, createStyles, withStyles } from '@material-ui/core/styles';
+import {
+  withStyles,
+  WithStyles,
+  createStyles,
+  Theme,
+} from '@material-ui/core/styles';
 import { Moment } from 'moment';
 import {
   fetchStationDateRange,
@@ -18,32 +23,37 @@ import Paper from '@material-ui/core/Paper';
 import { IStationsResults } from '../models/Stations';
 import { IStationDataTypeResults } from '../models/StationDataType';
 import { Button } from '@material-ui/core';
+import FastForwardIcon from '@material-ui/icons/FastForward';
+import FastRewindIcon from '@material-ui/icons/FastRewind';
 import TablePaginationActions from './table-core/TablePaginationActions';
 
-//---table related methods
-const StyledTableRow = withStyles((theme: Theme) =>
+const styles = ({ palette }: Theme) =>
   createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  })
-)(TableRow);
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
+    headerCell: {
+      backgroundColor: palette.common.black,
+      color: palette.common.white,
+      fontSize: 16,
       width: '100%',
     },
-  })
-)(TableCell);
-//---table related methods
-export interface IWeatherStationTableProps {
+    tableRow: {
+      cursor: 'pointer',
+      '&:nth-of-type(odd)': {
+        backgroundColor: palette.action.hover,
+      },
+    },
+    tableCell: {
+      width: 160,
+    },
+    btn: {
+      maxWidth: '30',
+      maxHeight: '30',
+      minWidth: '30',
+      minHeight: '30',
+    },
+    emptyRow: {},
+  });
+
+export interface IWeatherStationTableProps extends WithStyles<typeof styles> {
   results: IStationsResults[];
   getSelectedStationIdAndName: (
     selectedStationId: string,
@@ -169,7 +179,7 @@ class WeatherStationTable extends React.Component<
   };
 
   render() {
-    const { results } = this.props;
+    const { results, classes } = this.props;
     const { page, rowsPerPage } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, results.length - page * rowsPerPage);
@@ -177,17 +187,32 @@ class WeatherStationTable extends React.Component<
       <TableContainer component={Paper}>
         <Table aria-label="weather station table">
           <TableHead>
-            <StyledTableRow>
-              <StyledTableCell component="th" scope="row" align="left">
+            <TableRow>
+              <TableCell
+                className={classes.headerCell}
+                component="th"
+                scope="row"
+                align="left"
+              >
                 Station Name
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="right">
+              </TableCell>
+              <TableCell
+                className={classes.headerCell}
+                component="th"
+                scope="row"
+                align="right"
+              >
                 Latitude
-              </StyledTableCell>
-              <StyledTableCell component="th" scope="row" align="right">
+              </TableCell>
+              <TableCell
+                className={classes.headerCell}
+                component="th"
+                scope="row"
+                align="right"
+              >
                 Longitude
-              </StyledTableCell>
-            </StyledTableRow>
+              </TableCell>
+            </TableRow>
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
@@ -197,25 +222,30 @@ class WeatherStationTable extends React.Component<
                 )
               : results
             ).map((result, idx) => (
-              <StyledTableRow
+              <TableRow
+                className={classes.tableRow}
                 key={idx}
                 onClick={() => this.handleRowClick(result.id, result.name)}
               >
-                <TableCell component="th" scope="row">
+                <TableCell
+                  className={classes.tableCell}
+                  component="th"
+                  scope="row"
+                >
                   {result.name}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell className={classes.tableCell} align="right">
                   {result.latitude}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell className={classes.tableCell} align="right">
                   {result.longitude}
                 </TableCell>
-              </StyledTableRow>
+              </TableRow>
             ))}
             {emptyRows > 0 && (
-              <StyledTableRow style={{ height: 53 * emptyRows }}>
+              <TableRow style={{ height: 53 * emptyRows }}>
                 <TableCell colSpan={6} />
-              </StyledTableRow>
+              </TableRow>
             )}
           </TableBody>
           <TableFooter>
@@ -242,20 +272,24 @@ class WeatherStationTable extends React.Component<
             <TableRow>
               <TableCell>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   color="primary"
                   onClick={() => this.onPreviousBtnClick()}
+                  className={classes.btn}
                 >
+                  <FastRewindIcon />
                   Previous Batch
                 </Button>
               </TableCell>
               <TableCell>
                 <Button
-                  variant="contained"
-                  color="secondary"
+                  variant="outlined"
+                  color="primary"
                   onClick={() => this.onNextBtnClick()}
+                  className={classes.btn}
                 >
                   Next Batch
+                  <FastForwardIcon />
                 </Button>
               </TableCell>
             </TableRow>
@@ -265,4 +299,4 @@ class WeatherStationTable extends React.Component<
     );
   }
 }
-export default WeatherStationTable;
+export default withStyles(styles)(WeatherStationTable);
