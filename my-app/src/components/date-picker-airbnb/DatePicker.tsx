@@ -19,11 +19,6 @@ const OuterWrapper = styled.div`
   }
 `;
 
-// export interface DateRange {
-//   startDate: Moment | null;
-//   endDate: Moment | null;
-// }
-
 export interface IDatePickerProps {
   getSelectednewStartDate: (newStartDate: Moment) => void;
   getSelectednewEndDate: (newEndDate: Moment) => void;
@@ -104,8 +99,6 @@ class DatePicker extends React.Component<IDatePickerProps, IDatePickerState> {
           endDateId={endDateId}
           isOutsideRange={this.isDisabledDate}
           onDatesChange={({ startDate, endDate }) => {
-            console.log(startDate?.year(), endDate?.year());
-            console.log(startDate?.inspect(), endDate?.inspect());
             this.setState({
               startDate: startDate,
               endDate: endDate,

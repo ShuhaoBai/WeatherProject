@@ -28,6 +28,7 @@ class DatePickerNav extends React.Component<
     const newYear = changeEvent.target.value;
     onYearSelect(monthBeingShown, newYear);
   };
+  componentDidMount() {}
   render() {
     const { monthBeingShown, newestAllowed, oldestAllowed } = this.props;
     const currentYear = monthBeingShown.year();
@@ -49,6 +50,7 @@ class DatePickerNav extends React.Component<
       <OuterWrapper>
         <strong>{monthBeingShown.format('MMMM')}</strong>
         <Select value={currentYear} onChange={this.handleYearChange}>
+          <option value="">Select Year</option>
           {years.map((year) => (
             <option key={year} value={year}>
               {year}
