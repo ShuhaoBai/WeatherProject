@@ -70,6 +70,7 @@ export interface IWeatherStationTableState {
   page: number;
   rowsPerPage: number;
   pageChangeCount: number;
+  disablePreviousBtn: boolean;
 }
 class WeatherStationTable extends React.Component<
   IWeatherStationTableProps,
@@ -83,6 +84,7 @@ class WeatherStationTable extends React.Component<
       page: 0,
       rowsPerPage: 5,
       pageChangeCount: 0,
+      disablePreviousBtn: true,
     };
   }
   componentDidUpdate(prevProps: any, prevState: { pageChangeCount: number }) {
@@ -91,7 +93,6 @@ class WeatherStationTable extends React.Component<
       this.startFetchingNextOrPreviousPageStation(updatedPageCount);
     }
   }
-  //---table related methods
   handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -108,7 +109,6 @@ class WeatherStationTable extends React.Component<
       page: 0,
     });
   };
-  //---table related methods
   handleRowClick = (cellValue: string, selectedStationName: string) => {
     const stationId = cellValue;
     this.props.getSelectedStationIdAndName(stationId, selectedStationName);
@@ -128,6 +128,7 @@ class WeatherStationTable extends React.Component<
     }
   };
 
+  //TODO - Disable next batch button based on returned data count
   onPreviousBtnClick = () => {
     if (this.state.pageChangeCount > 0) {
       this.setState(
@@ -139,14 +140,18 @@ class WeatherStationTable extends React.Component<
             this.state.pageChangeCount * 25
           )
       );
-    } else {
-      alert('Reached the beginning of the data list...');
+    }
+    if (this.state.pageChangeCount === 1) {
+      this.setState({
+        disablePreviousBtn: true,
+      });
     }
   };
   onNextBtnClick = () => {
     this.setState(
       {
         pageChangeCount: this.state.pageChangeCount + 1,
+        disablePreviousBtn: false,
       },
       () =>
         this.startFetchingNextOrPreviousPageStation(
@@ -273,6 +278,7 @@ class WeatherStationTable extends React.Component<
                   color="primary"
                   onClick={() => this.onPreviousBtnClick()}
                   size="small"
+                  disabled={this.state.disablePreviousBtn}
                 >
                   <FastRewindIcon />
                   Batch

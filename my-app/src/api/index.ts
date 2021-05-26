@@ -1,6 +1,7 @@
 import axios from 'axios';
 import moment, { Moment } from 'moment';
-const api_token = 'ipZdCjijQVoUPrAsXXOpPEumFeCNNVio';
+import { API_TOKEN } from '../lib/config';
+const api_token = API_TOKEN;
 
 export const fetchStations = async () => {
   const url = 'https://www.ncdc.noaa.gov/cdo-web/api/v2/stations';

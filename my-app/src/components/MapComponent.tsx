@@ -51,7 +51,14 @@ class MapComponent extends React.Component<
     prevProps: any,
     prevState: { boundsData: L.LatLngBounds[] }
   ) {
-    if (prevState.boundsData !== this.state.boundsData) {
+    if (
+      prevState.boundsData.length !== 0 &&
+      this.state.boundsData.length !== 0 &&
+      prevState.boundsData[0].getNorthEast() !==
+        this.state.boundsData[0].getNorthEast() &&
+      prevState.boundsData[0].getSouthWest() !==
+        this.state.boundsData[0].getSouthWest()
+    ) {
       this.setState({
         boundsData: this.state.boundsData,
       });
@@ -84,7 +91,7 @@ class MapComponent extends React.Component<
             position={[result.latitude, result.longitude]}
             key={result.id}
           >
-            <Popup>
+            <Popup autoPan={false}>
               <span>Station Name: {result.name}</span>
               <br />
               <span>
@@ -97,10 +104,7 @@ class MapComponent extends React.Component<
             </Popup>
           </Marker>
         ))}
-        <GrabBounds
-          // saveBounds={(newBoundCoords) => this.saveBoundsMethod(newBoundCoords)}
-          saveBounds={this.saveBoundsMethod}
-        />
+        <GrabBounds saveBounds={this.saveBoundsMethod} />
       </MapContainer>
     );
   }

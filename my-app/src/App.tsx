@@ -141,7 +141,7 @@ class App extends React.Component<IAppProps, IAppState> {
     });
   };
 
-  // After clicking search button, fetch data with stationId, bufferDates, dataType
+  // After clicking search button, fetch data with stationId, bufferDates, dataset Id
   onClickSubmit = async () => {
     if (
       this.state.bufferStartDate &&
@@ -209,18 +209,20 @@ class App extends React.Component<IAppProps, IAppState> {
       this.state.avaiableDataTypeResults.length > 0
     ) {
       dataSetIdList = (
-        <SimpleList
-          avaiableDataTypeResults={this.state.avaiableDataTypeResults}
-          getMenuItemValue={(menuItemValue) =>
-            this.getMenuItemValue(menuItemValue)
-          }
-        />
+        <Paper variant="outlined">
+          <SimpleList
+            avaiableDataTypeResults={this.state.avaiableDataTypeResults}
+            getMenuItemValue={(menuItemValue) =>
+              this.getMenuItemValue(menuItemValue)
+            }
+          />
+        </Paper>
       );
     } else {
       dataSetIdList = (
-        <div>
+        <Paper variant="outlined">
           <span>No Dataset ID available for this station</span>
-        </div>
+        </Paper>
       );
     }
 
@@ -235,16 +237,18 @@ class App extends React.Component<IAppProps, IAppState> {
       this.state.singleTableResults.length > 0
     ) {
       newSingleTable = (
-        <NewSingleTable singleTableResults={this.state.singleTableResults} />
+        <Paper variant="outlined">
+          <NewSingleTable singleTableResults={this.state.singleTableResults} />
+        </Paper>
       );
     } else if (
       this.state.selectedStationName &&
       !this.state.avaiableDataTypeResults
     ) {
       newSingleTable = (
-        <div>
+        <Paper variant="outlined">
           <h1>No Data Available</h1>
-        </div>
+        </Paper>
       );
     }
 
@@ -299,24 +303,22 @@ class App extends React.Component<IAppProps, IAppState> {
                 <h3>Please select a station from above table.</h3>
               )}
             </Paper>
-            <Paper variant="outlined">{dataSetIdList}</Paper>
+            {dataSetIdList}
             {this.state.avaiableDataTypeResults && (
-              <Grid container spacing={6}>
-                <Grid item xs={6}>
-                  <DatePicker
-                    getSelectednewStartDate={(newStartDate) =>
-                      this.getSelectednewStartDate(newStartDate)
-                    }
-                    getSelectednewEndDate={(newEndDate) =>
-                      this.getSelectednewEndDate(newEndDate)
-                    }
-                    oldestAllowed={this.state.oldestAllowed}
-                    newestAllowed={this.state.newestAllowed}
-                  />
-                </Grid>
-              </Grid>
+              <div>
+                <DatePicker
+                  getSelectednewStartDate={(newStartDate) =>
+                    this.getSelectednewStartDate(newStartDate)
+                  }
+                  getSelectednewEndDate={(newEndDate) =>
+                    this.getSelectednewEndDate(newEndDate)
+                  }
+                  oldestAllowed={this.state.oldestAllowed}
+                  newestAllowed={this.state.newestAllowed}
+                />
+              </div>
             )}
-            <Paper variant="outlined">{newSingleTable}</Paper>
+            {newSingleTable}
             {searchButton}
           </Grid>
           <Grid item xs={8}>
