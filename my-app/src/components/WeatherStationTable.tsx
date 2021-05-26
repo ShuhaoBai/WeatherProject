@@ -44,13 +44,9 @@ const styles = ({ palette }: Theme) =>
     tableCell: {
       width: 160,
     },
-    btn: {
-      maxWidth: '30',
-      maxHeight: '30',
-      minWidth: '30',
-      minHeight: '30',
+    btnCell: {
+      padding: 'inherit',
     },
-    emptyRow: {},
   });
 
 export interface IWeatherStationTableProps extends WithStyles<typeof styles> {
@@ -270,25 +266,26 @@ class WeatherStationTable extends React.Component<
               />
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell></TableCell>
+              <TableCell className={classes.btnCell}>
                 <Button
                   variant="outlined"
                   color="primary"
                   onClick={() => this.onPreviousBtnClick()}
-                  className={classes.btn}
+                  size="small"
                 >
                   <FastRewindIcon />
-                  Previous Batch
+                  Batch
                 </Button>
               </TableCell>
-              <TableCell>
+              <TableCell className={classes.btnCell}>
                 <Button
                   variant="outlined"
                   color="primary"
                   onClick={() => this.onNextBtnClick()}
-                  className={classes.btn}
+                  size="small"
                 >
-                  Next Batch
+                  Batch
                   <FastForwardIcon />
                 </Button>
               </TableCell>

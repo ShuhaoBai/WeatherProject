@@ -43,7 +43,6 @@ export const fetchSingleStationYealySummaryWithStationId = async (
 ) => {
   const convertedStartDate = startDate.format().slice(0, 10);
   const convertedEndDate = endDate.format().slice(0, 10);
-  // const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=PRECIP_15&stationid=${selectedStationId}&units=metric&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
   const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=${dataSetId}&stationid=${selectedStationId}&units=standard&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
   try {
     const fetchedSingleStationYearlySummaryWithStationId = await axios.get(

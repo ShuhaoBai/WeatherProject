@@ -51,8 +51,8 @@ class DatePickerNav extends React.Component<
         <strong>{monthBeingShown.format('MMMM')}</strong>
         <Select value={currentYear} onChange={this.handleYearChange}>
           <option value="">Select Year</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
+          {years.map((year, idx) => (
+            <option key={idx} value={year}>
               {year}
             </option>
           ))}

@@ -98,7 +98,7 @@ class NewSingleTable extends React.Component<
                   scope="row"
                   align="left"
                 >
-                  Date
+                  Date and Time
                 </TableCell>
                 <TableCell
                   className={classes.headerCell}

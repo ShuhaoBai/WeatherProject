@@ -172,13 +172,10 @@ class App extends React.Component<IAppProps, IAppState> {
         menuItemValue
       );
     if (fetchedSingleStationYealySummaryDataWithStationId) {
-      this.setState(
-        {
-          singleTableResults:
-            fetchedSingleStationYealySummaryDataWithStationId.results,
-        },
-        () => console.log(this.state.singleTableResults)
-      );
+      this.setState({
+        singleTableResults:
+          fetchedSingleStationYealySummaryDataWithStationId.results,
+      });
     }
   };
 
@@ -190,25 +187,20 @@ class App extends React.Component<IAppProps, IAppState> {
   getStationAvailableDataType = (
     avaiableDataTypeResults: IStationDataTypeResults[]
   ) => {
-    this.setState(
-      {
-        avaiableDataTypeResults: avaiableDataTypeResults,
-      },
-      () => console.log(avaiableDataTypeResults)
-    );
+    this.setState({
+      avaiableDataTypeResults: avaiableDataTypeResults,
+    });
   };
   getMenuItemValue = (menuItemValue: string) => {
-    this.setState(
-      {
-        menuItemValue: menuItemValue,
-      },
-      () => console.log(this.state.menuItemValue)
-    );
+    this.setState({
+      menuItemValue: menuItemValue,
+    });
   };
 
   render() {
     let dataSetIdList;
     let newSingleTable;
+    let searchButton;
 
     if (!this.state.selectedStationName) {
       dataSetIdList = null;
@@ -255,9 +247,24 @@ class App extends React.Component<IAppProps, IAppState> {
         </div>
       );
     }
+
+    if (
+      !this.state.selectedStationName ||
+      !this.state.avaiableDataTypeResults
+    ) {
+      searchButton = null;
+    } else {
+      searchButton = (
+        <Grid item xs={4}>
+          <Button variant="contained" onClick={this.onClickSubmit}>
+            Search
+          </Button>
+        </Grid>
+      );
+    }
     return (
       <div>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid item xs={4}>
             <Paper variant="outlined">
               <WeatherStationTable
@@ -307,16 +314,11 @@ class App extends React.Component<IAppProps, IAppState> {
                     newestAllowed={this.state.newestAllowed}
                   />
                 </Grid>
-                <Grid item xs={6}>
-                  <Button variant="contained" onClick={this.onClickSubmit}>
-                    Search
-                  </Button>
-                </Grid>
               </Grid>
             )}
             <Paper variant="outlined">{newSingleTable}</Paper>
+            {searchButton}
           </Grid>
-
           <Grid item xs={8}>
             <Paper variant="outlined">
               <MapComponent
