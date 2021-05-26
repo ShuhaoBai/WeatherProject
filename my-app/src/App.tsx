@@ -15,17 +15,22 @@ import { IStationsResults } from './models/Stations';
 import * as L from 'leaflet';
 import { Button } from '@material-ui/core';
 import { IPrecipStationResults } from './models/PrecipStation';
+import { IStationDataTypeResults } from './models/StationDataType';
+import SimpleList from './components/list/SimpleList';
 
 export interface IAppProps {}
 export interface IAppState {
   results: IStationsResults[];
   boundsData: L.LatLngBounds[];
   selectedStationId: string;
+  selectedStationName: string;
   bufferStartDate?: Moment;
   bufferEndDate?: Moment;
   singleTableResults: IPrecipStationResults[];
+  avaiableDataTypeResults: IStationDataTypeResults[];
   newestAllowed?: Moment;
   oldestAllowed?: Moment;
+  menuItemValue: string;
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -35,11 +40,14 @@ class App extends React.Component<IAppProps, IAppState> {
       results: [],
       boundsData: [],
       selectedStationId: '',
+      selectedStationName: '',
       bufferStartDate: undefined,
       bufferEndDate: undefined,
       singleTableResults: [],
+      avaiableDataTypeResults: [],
       newestAllowed: undefined,
       oldestAllowed: undefined,
+      menuItemValue: '',
     };
   }
 
@@ -101,13 +109,16 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   //Get one single station id from WeatherStationTable, by clicking on a table row
-  getSelectedStationId = (selectedStationId: string) => {
+  getSelectedStationIdAndName = (
+    selectedStationId: string,
+    selectedStationName: string
+  ) => {
     this.setState({
       selectedStationId: selectedStationId,
+      selectedStationName: selectedStationName,
     });
   };
 
-  //TODO - ability to select datasetid and units, then fetch yearly data
   getSelectednewStartDate = (newStartDate: Moment) => {
     this.setState({
       bufferStartDate: newStartDate,
@@ -129,16 +140,19 @@ class App extends React.Component<IAppProps, IAppState> {
     });
   };
 
+  // After clicking search button, fetch data with stationId, bufferDates, dataType
   onClickSubmit = async () => {
     if (
       this.state.bufferStartDate &&
       this.state.bufferEndDate &&
-      this.state.selectedStationId
+      this.state.selectedStationId &&
+      this.state.menuItemValue
     ) {
       await this.startFetchingSingleStationYearlySummaryWithStationId(
         this.state.selectedStationId,
         this.state.bufferStartDate,
-        this.state.bufferEndDate
+        this.state.bufferEndDate,
+        this.state.menuItemValue
       );
     }
   };
@@ -146,19 +160,24 @@ class App extends React.Component<IAppProps, IAppState> {
   startFetchingSingleStationYearlySummaryWithStationId = async (
     stationId: string,
     bufferStartDate: Moment,
-    bufferEndDate: Moment
+    bufferEndDate: Moment,
+    menuItemValue: string
   ) => {
     const fetchedSingleStationYealySummaryDataWithStationId =
       await fetchSingleStationYealySummaryWithStationId(
         stationId,
         bufferStartDate,
-        bufferEndDate
+        bufferEndDate,
+        menuItemValue
       );
     if (fetchedSingleStationYealySummaryDataWithStationId) {
-      this.setState({
-        singleTableResults:
-          fetchedSingleStationYealySummaryDataWithStationId.results,
-      });
+      this.setState(
+        {
+          singleTableResults:
+            fetchedSingleStationYealySummaryDataWithStationId.results,
+        },
+        () => console.log(this.state.singleTableResults)
+      );
     }
   };
 
@@ -167,8 +186,62 @@ class App extends React.Component<IAppProps, IAppState> {
       results: nextPageResults,
     });
   };
+  getStationAvailableDataType = (
+    avaiableDataTypeResults: IStationDataTypeResults[]
+  ) => {
+    this.setState(
+      {
+        avaiableDataTypeResults: avaiableDataTypeResults,
+      },
+      () => console.log(avaiableDataTypeResults)
+    );
+  };
+  getMenuItemValue = (menuItemValue: string) => {
+    this.setState(
+      {
+        menuItemValue: menuItemValue,
+      },
+      () => console.log(this.state.menuItemValue)
+    );
+  };
 
   render() {
+    let simpleList;
+    let newSingleTable;
+    if (
+      this.state.avaiableDataTypeResults &&
+      this.state.avaiableDataTypeResults.length > 0
+    ) {
+      simpleList = (
+        <SimpleList
+          avaiableDataTypeResults={this.state.avaiableDataTypeResults}
+          getMenuItemValue={(menuItemValue) =>
+            this.getMenuItemValue(menuItemValue)
+          }
+        />
+      );
+    } else {
+      simpleList = (
+        <div>
+          <h1>No Dataset ID available for this station</h1>
+        </div>
+      );
+    }
+
+    if (
+      this.state.singleTableResults &&
+      this.state.singleTableResults.length > 0
+    ) {
+      newSingleTable = (
+        <NewSingleTable singleTableResults={this.state.singleTableResults} />
+      );
+    } else {
+      newSingleTable = (
+        <div>
+          <h1>No Data Available</h1>
+        </div>
+      );
+    }
     return (
       <div>
         <Grid container spacing={3}>
@@ -176,8 +249,14 @@ class App extends React.Component<IAppProps, IAppState> {
             <Paper>
               <WeatherStationTable
                 results={this.state.results}
-                getSelectedStationId={(selectedStationId) =>
-                  this.getSelectedStationId(selectedStationId)
+                getSelectedStationIdAndName={(
+                  selectedStationId,
+                  selectedStationName
+                ) =>
+                  this.getSelectedStationIdAndName(
+                    selectedStationId,
+                    selectedStationName
+                  )
                 }
                 getStationDateRange={(newestAllowed, oldestAllowed) =>
                   this.getStationDateRange(newestAllowed, oldestAllowed)
@@ -185,34 +264,37 @@ class App extends React.Component<IAppProps, IAppState> {
                 getNextOrPreviousPageStationData={(nextPageResults) =>
                   this.getNextOrPreviousPageStationData(nextPageResults)
                 }
+                getStationAvailableDataType={(avaiableDataTypeResults) =>
+                  this.getStationAvailableDataType(avaiableDataTypeResults)
+                }
               />
             </Paper>
             <Paper>
-              {this.state.singleTableResults &&
-                this.state.singleTableResults.length !== 0 && (
-                  <NewSingleTable
-                    singleTableResults={this.state.singleTableResults}
-                  />
-                )}
-              {!this.state.singleTableResults && (
+              {this.state.selectedStationName ? (
+                <h1>Selected Station: {this.state.selectedStationName}</h1>
+              ) : (
+                <h1>Please select a station from above table.</h1>
+              )}
+            </Paper>
+            <Paper>{simpleList}</Paper>
+            <Paper>
+              {this.state.avaiableDataTypeResults && (
                 <div>
-                  <h1>No Data Available for This Station...</h1>
+                  <DatePicker
+                    getSelectednewStartDate={(newStartDate) =>
+                      this.getSelectednewStartDate(newStartDate)
+                    }
+                    getSelectednewEndDate={(newEndDate) =>
+                      this.getSelectednewEndDate(newEndDate)
+                    }
+                    oldestAllowed={this.state.oldestAllowed}
+                    newestAllowed={this.state.newestAllowed}
+                  />
+                  <Button onClick={this.onClickSubmit}>Search</Button>
                 </div>
               )}
             </Paper>
-            <Paper>
-              <DatePicker
-                getSelectednewStartDate={(newStartDate) =>
-                  this.getSelectednewStartDate(newStartDate)
-                }
-                getSelectednewEndDate={(newEndDate) =>
-                  this.getSelectednewEndDate(newEndDate)
-                }
-                oldestAllowed={this.state.oldestAllowed}
-                newestAllowed={this.state.newestAllowed}
-              />
-              <Button onClick={this.onClickSubmit}>Search</Button>
-            </Paper>
+            <Paper>{newSingleTable}</Paper>
           </Grid>
 
           <Grid item xs={8}>

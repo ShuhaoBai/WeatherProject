@@ -1,7 +1,11 @@
 import React from 'react';
 import { Theme, createStyles, withStyles } from '@material-ui/core/styles';
 import { Moment } from 'moment';
-import { fetchStationDateRange, fetchNextOrPreviousPageStation } from '../api';
+import {
+  fetchStationDateRange,
+  fetchNextOrPreviousPageStation,
+  fetchSingleStationAvailableDataType,
+} from '../api';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -12,6 +16,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { IStationsResults } from '../models/Stations';
+import { IStationDataTypeResults } from '../models/StationDataType';
 import { Button } from '@material-ui/core';
 import TablePaginationActions from './table-core/TablePaginationActions';
 
@@ -40,13 +45,19 @@ const StyledTableCell = withStyles((theme: Theme) =>
 //---table related methods
 export interface IWeatherStationTableProps {
   results: IStationsResults[];
-  getSelectedStationId: (selectedStationId: string) => void;
+  getSelectedStationIdAndName: (
+    selectedStationId: string,
+    selectedStationName: string
+  ) => void;
   getStationDateRange: (
     newestAllowed: Moment | undefined,
     oldestAllowed: Moment | undefined
   ) => void;
   getNextOrPreviousPageStationData: (
     nextPageResults: IStationsResults[]
+  ) => void;
+  getStationAvailableDataType: (
+    avaiableDataTypeResults: IStationDataTypeResults[]
   ) => void;
 }
 export interface IWeatherStationTableState {
@@ -82,7 +93,6 @@ class WeatherStationTable extends React.Component<
     this.setState({
       page: newPage,
     });
-    // }
   };
   handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -93,10 +103,23 @@ class WeatherStationTable extends React.Component<
     });
   };
   //---table related methods
-  handleRowClick = async (cellValue: string) => {
+  handleRowClick = (cellValue: string, selectedStationName: string) => {
     const stationId = cellValue;
-    this.props.getSelectedStationId(stationId);
+    this.props.getSelectedStationIdAndName(stationId, selectedStationName);
     this.startFetchingStationDateRange(stationId);
+    this.startFetchingSingleStationAvailableDataType(stationId);
+  };
+
+  startFetchingSingleStationAvailableDataType = async (
+    selectedStationId: string
+  ) => {
+    const fetchedSingleStationAvailableDataType =
+      await fetchSingleStationAvailableDataType(selectedStationId);
+    if (fetchedSingleStationAvailableDataType) {
+      this.props.getStationAvailableDataType(
+        fetchedSingleStationAvailableDataType.results
+      );
+    }
   };
 
   onPreviousBtnClick = () => {
@@ -176,7 +199,7 @@ class WeatherStationTable extends React.Component<
             ).map((result, idx) => (
               <StyledTableRow
                 key={idx}
-                onClick={() => this.handleRowClick(result.id)}
+                onClick={() => this.handleRowClick(result.id, result.name)}
               >
                 <TableCell component="th" scope="row">
                   {result.name}

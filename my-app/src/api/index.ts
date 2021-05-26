@@ -30,14 +30,34 @@ export const fetchSingleStation = async (stationId: string) => {
   }
 };
 
+// Fetch available data type for the selected station
+export const fetchSingleStationAvailableDataType = async (
+  selectedStationId: string
+) => {
+  const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets?stationid=${selectedStationId}`;
+  try {
+    const fetchedStationsData = await axios.get(`${setUrl}`, {
+      headers: { token: `${api_token}` },
+    });
+    const {
+      data: { results },
+    } = fetchedStationsData;
+    return { results };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const fetchSingleStationYealySummaryWithStationId = async (
   selectedStationId: string,
   startDate: Moment,
-  endDate: Moment
+  endDate: Moment,
+  dataSetId: string
 ) => {
   const convertedStartDate = startDate.format().slice(0, 10);
   const convertedEndDate = endDate.format().slice(0, 10);
-  const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=PRECIP_15&stationid=${selectedStationId}&units=metric&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
+  // const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=PRECIP_15&stationid=${selectedStationId}&units=metric&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
+  const setUrl = `https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=${dataSetId}&stationid=${selectedStationId}&units=standard&startdate=${convertedStartDate}&enddate=${convertedEndDate}`;
   try {
     const fetchedSingleStationYearlySummaryWithStationId = await axios.get(
       `${setUrl}`,

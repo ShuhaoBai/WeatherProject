@@ -69,8 +69,8 @@ class MapComponent extends React.Component<
     const { results } = this.props;
     return (
       <MapContainer
-        center={[38.9471, -98.3534]}
-        zoom={4}
+        center={[31.5702, -85.2482]}
+        zoom={7}
         maxZoom={12}
         scrollWheelZoom={false}
         style={{ height: 1000 }}
