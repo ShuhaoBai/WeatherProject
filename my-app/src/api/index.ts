@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment, { Moment } from 'moment';
-import { API_TOKEN } from '../lib/config';
+import { API_TOKEN } from '../config/api-config';
 const api_token = API_TOKEN;
 
 export const fetchStations = async () => {
