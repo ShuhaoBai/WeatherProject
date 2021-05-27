@@ -39,19 +39,19 @@ const styles = ({ palette }: Theme) =>
     emptyRow: {},
   });
 
-export interface INewSingleTableProps extends WithStyles<typeof styles> {
-  singleTableResults: IPrecipStationResults[];
+export interface IStationDetailTableProps extends WithStyles<typeof styles> {
+  singleStationDetailResults: IPrecipStationResults[];
 }
-export interface INewSingleTableState {
+export interface IStationDetailTableState {
   page: number;
   rowsPerPage: number;
 }
 
-class NewSingleTable extends React.Component<
-  INewSingleTableProps,
-  INewSingleTableState
+class StationDetailTable extends React.Component<
+  IStationDetailTableProps,
+  IStationDetailTableState
 > {
-  constructor(props: INewSingleTableProps) {
+  constructor(props: IStationDetailTableProps) {
     super(props);
     this.state = {
       page: 0,
@@ -75,9 +75,9 @@ class NewSingleTable extends React.Component<
     });
   };
   render() {
-    const { singleTableResults, classes } = this.props;
+    const { singleStationDetailResults, classes } = this.props;
     const { page, rowsPerPage } = this.state;
-    if (!singleTableResults) {
+    if (!singleStationDetailResults) {
       return (
         <div>
           <h1>No data available for this station...</h1>
@@ -86,7 +86,10 @@ class NewSingleTable extends React.Component<
     } else {
       const emptyRows =
         rowsPerPage -
-        Math.min(rowsPerPage, singleTableResults.length - page * rowsPerPage);
+        Math.min(
+          rowsPerPage,
+          singleStationDetailResults.length - page * rowsPerPage
+        );
       return (
         <TableContainer component={Paper}>
           <Table aria-label="weather station information detail table">
@@ -136,11 +139,11 @@ class NewSingleTable extends React.Component<
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? singleTableResults.slice(
+                ? singleStationDetailResults.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : singleTableResults
+                : singleStationDetailResults
               ).map((result, idx) => (
                 <TableRow className={classes.tableRow} key={idx}>
                   <TableCell
@@ -175,7 +178,7 @@ class NewSingleTable extends React.Component<
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                   colSpan={5}
-                  count={singleTableResults.length}
+                  count={singleStationDetailResults.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -199,4 +202,4 @@ class NewSingleTable extends React.Component<
   }
 }
 
-export default withStyles(styles)(NewSingleTable);
+export default withStyles(styles)(StationDetailTable);

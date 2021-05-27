@@ -14,7 +14,7 @@ import { IPrecipStationResults } from './models/PrecipStation';
 import { IStationDataTypeResults } from './models/StationDataType';
 import SimpleList from './components/list/SimpleList';
 import WeatherStationTable from './components/WeatherStationTable';
-import NewSingleTable from './components/NewSingleTable';
+import StationDetailTable from './components/StationDetailTable';
 import DatePicker from './components/date-picker-airbnb/DatePicker';
 import MapComponent from './components/MapComponent';
 
@@ -26,7 +26,7 @@ export interface IAppState {
   selectedStationName: string;
   bufferStartDate?: Moment;
   bufferEndDate?: Moment;
-  singleTableResults: IPrecipStationResults[];
+  singleStationDetailResults: IPrecipStationResults[];
   avaiableDataTypeResults: IStationDataTypeResults[];
   newestAllowed?: Moment;
   oldestAllowed?: Moment;
@@ -38,7 +38,7 @@ class App extends React.Component<IAppProps, IAppState> {
     super(props);
     this.state = {
       results: [],
-      singleTableResults: [],
+      singleStationDetailResults: [],
       avaiableDataTypeResults: [],
       boundsData: [],
       selectedStationId: '',
@@ -173,7 +173,7 @@ class App extends React.Component<IAppProps, IAppState> {
       );
     if (fetchedSingleStationYealySummaryDataWithStationId) {
       this.setState({
-        singleTableResults:
+        singleStationDetailResults:
           fetchedSingleStationYealySummaryDataWithStationId.results,
       });
     }
@@ -199,7 +199,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   render() {
     let dataSetIdList;
-    let newSingleTable;
+    let stationDetailTable;
     let searchButton;
 
     if (!this.state.selectedStationName) {
@@ -228,24 +228,26 @@ class App extends React.Component<IAppProps, IAppState> {
 
     if (
       !this.state.selectedStationName ||
-      !this.state.singleTableResults ||
+      !this.state.singleStationDetailResults ||
       !this.state.avaiableDataTypeResults
     ) {
-      newSingleTable = null;
+      stationDetailTable = null;
     } else if (
-      this.state.singleTableResults &&
-      this.state.singleTableResults.length > 0
+      this.state.singleStationDetailResults &&
+      this.state.singleStationDetailResults.length > 0
     ) {
-      newSingleTable = (
+      stationDetailTable = (
         <Paper variant="outlined">
-          <NewSingleTable singleTableResults={this.state.singleTableResults} />
+          <StationDetailTable
+            singleStationDetailResults={this.state.singleStationDetailResults}
+          />
         </Paper>
       );
     } else if (
       this.state.selectedStationName &&
       !this.state.avaiableDataTypeResults
     ) {
-      newSingleTable = (
+      stationDetailTable = (
         <Paper variant="outlined">
           <h1>No Data Available</h1>
         </Paper>
@@ -318,7 +320,7 @@ class App extends React.Component<IAppProps, IAppState> {
                 />
               </div>
             )}
-            {newSingleTable}
+            {stationDetailTable}
             {searchButton}
           </Grid>
           <Grid item xs={8}>
