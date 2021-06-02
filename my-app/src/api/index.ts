@@ -98,17 +98,38 @@ export const fetchStationDateRange = async (stationId: string) => {
   }
 };
 
-export const fetchNextOrPreviousPageStation = async (offset: number) => {
-  const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?offset=${offset}`;
-  try {
-    const fetchedStationsData = await axios.get(`${url}`, {
-      headers: { token: `${api_token}` },
-    });
-    const {
-      data: { results },
-    } = fetchedStationsData;
-    return { results };
-  } catch (error) {
-    console.log(error);
+export const fetchNextOrPreviousPageStation = async (
+  offset: number,
+  southWest_lat?: number,
+  southWest_lng?: number,
+  northEast_lat?: number,
+  northEast_lng?: number
+) => {
+  if (southWest_lat) {
+    const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?extent=${southWest_lat},${southWest_lng},${northEast_lat},${northEast_lng}&offset=${offset}`;
+    try {
+      const fetchedStationsData = await axios.get(`${url}`, {
+        headers: { token: `${api_token}` },
+      });
+      const {
+        data: { results },
+      } = fetchedStationsData;
+      return { results };
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const url = `https://www.ncdc.noaa.gov/cdo-web/api/v2/stations?offset=${offset}`;
+    try {
+      const fetchedStationsData = await axios.get(`${url}`, {
+        headers: { token: `${api_token}` },
+      });
+      const {
+        data: { results },
+      } = fetchedStationsData;
+      return { results };
+    } catch (error) {
+      console.log(error);
+    }
   }
 };

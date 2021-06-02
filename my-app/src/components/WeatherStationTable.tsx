@@ -1,4 +1,5 @@
 import React from 'react';
+import * as L from 'leaflet';
 import {
   withStyles,
   WithStyles,
@@ -51,6 +52,7 @@ const styles = ({ palette }: Theme) =>
 
 export interface IWeatherStationTableProps extends WithStyles<typeof styles> {
   results: IStationsResults[];
+  newBoundsData: L.LatLngBounds[];
   getSelectedStationIdAndName: (
     selectedStationId: string,
     selectedStationName: string
@@ -146,26 +148,76 @@ class WeatherStationTable extends React.Component<
     }
   };
   onNextBtnClick = () => {
-    this.setState(
-      {
-        pageChangeCount: this.state.pageChangeCount + 1,
-        disablePreviousBtn: false,
-      },
-      () =>
-        this.startFetchingNextOrPreviousPageStation(
-          this.state.pageChangeCount * 25
-        )
-    );
+    if (this.props.newBoundsData.length > 0) {
+      let southWest_lat = +this.props.newBoundsData[0]
+        .getSouthWest()
+        .lat.toFixed(4);
+      let southWest_lng = +this.props.newBoundsData[0]
+        .getSouthWest()
+        .lng.toFixed(4);
+      let northEast_lat = +this.props.newBoundsData[0]
+        .getNorthEast()
+        .lat.toFixed(4);
+      let northEast_lng = +this.props.newBoundsData[0]
+        .getNorthEast()
+        .lng.toFixed(4);
+      this.setState(
+        {
+          pageChangeCount: this.state.pageChangeCount + 1,
+          disablePreviousBtn: false,
+        },
+        () =>
+          this.startFetchingNextOrPreviousPageStation(
+            this.state.pageChangeCount * 25,
+            southWest_lat,
+            southWest_lng,
+            northEast_lat,
+            northEast_lng
+          )
+      );
+    } else {
+      this.setState(
+        {
+          pageChangeCount: this.state.pageChangeCount + 1,
+          disablePreviousBtn: false,
+        },
+        () =>
+          this.startFetchingNextOrPreviousPageStation(
+            this.state.pageChangeCount * 25
+          )
+      );
+    }
   };
 
-  startFetchingNextOrPreviousPageStation = async (offset: number) => {
-    const fetchedNextPageStationData = await fetchNextOrPreviousPageStation(
-      offset
-    );
-    if (fetchedNextPageStationData) {
-      this.props.getNextOrPreviousPageStationData(
-        fetchedNextPageStationData.results
+  startFetchingNextOrPreviousPageStation = async (
+    offset: number,
+    southWest_lat?: number,
+    southWest_lng?: number,
+    northEast_lat?: number,
+    northEast_lng?: number
+  ) => {
+    if (southWest_lat) {
+      const fetchedNextPageStationData = await fetchNextOrPreviousPageStation(
+        offset,
+        southWest_lat,
+        southWest_lng,
+        northEast_lat,
+        northEast_lng
       );
+      if (fetchedNextPageStationData) {
+        this.props.getNextOrPreviousPageStationData(
+          fetchedNextPageStationData.results
+        );
+      }
+    } else {
+      const fetchedNextPageStationData = await fetchNextOrPreviousPageStation(
+        offset
+      );
+      if (fetchedNextPageStationData) {
+        this.props.getNextOrPreviousPageStationData(
+          fetchedNextPageStationData.results
+        );
+      }
     }
   };
 

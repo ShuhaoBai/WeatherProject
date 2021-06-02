@@ -281,6 +281,7 @@ class App extends React.Component<IAppProps, IAppState> {
             <Paper variant="outlined">
               <WeatherStationTable
                 results={this.state.results}
+                newBoundsData={this.state.boundsData}
                 getSelectedStationIdAndName={(
                   selectedStationId,
                   selectedStationName
