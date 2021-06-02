@@ -36,7 +36,7 @@ class MapComponent extends React.Component<
   IMapComponentProps,
   IMapComponentState
 > {
-  constructor(props: IMapComponentProps | Readonly<IMapComponentProps>) {
+  constructor(props: IMapComponentProps) {
     super(props);
     this.state = {
       boundsData: [],

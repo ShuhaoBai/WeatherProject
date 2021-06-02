@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Obtain API Token
 
-Go to [https://www.ncdc.noaa.gov/cdo-web/token](https://www.ncdc.noaa.gov/cdo-web/token) to get a API Token and create api-config.ts file then save the token as API-TOKEN in directory: my-app/src/config
+Go to [https://www.ncdc.noaa.gov/cdo-web/token](https://www.ncdc.noaa.gov/cdo-web/token) to get a API Token and create api-config.ts file then save and export the token as API-TOKEN in directory: my-app/src/config
 
 ## Available Scripts
 

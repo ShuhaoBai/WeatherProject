@@ -76,9 +76,7 @@ class WeatherStationTable extends React.Component<
   IWeatherStationTableProps,
   IWeatherStationTableState
 > {
-  constructor(
-    props: IWeatherStationTableProps | Readonly<IWeatherStationTableProps>
-  ) {
+  constructor(props: IWeatherStationTableProps) {
     super(props);
     this.state = {
       page: 0,
