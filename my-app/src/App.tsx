@@ -66,7 +66,13 @@ class App extends React.Component<IAppProps, IAppState> {
     prevProps: any,
     prevState: { boundsData: L.LatLngBounds[] }
   ) {
-    if (prevState.boundsData !== this.state.boundsData) {
+    if (
+      prevState.boundsData[0] &&
+      prevState.boundsData[0].getNorthEast() !==
+        this.state.boundsData[0].getNorthEast() &&
+      prevState.boundsData[0].getSouthWest() !==
+        this.state.boundsData[0].getSouthWest()
+    ) {
       this.handleZoomSearch();
     }
   }
